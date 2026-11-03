@@ -13,6 +13,27 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
+
+    /* Reglas agresivas para ocultar cualquier inyección de Netlify */
+    iframe#netlify-drawer,
+    [data-netlify-deploy-preview],
+    [data-netlify-badge],
+    div[class*="netlify"],
+    div[id*="netlify"],
+    a[href*="netlify.com"],
+    .netlify-badge {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transform: scale(0) !important;
+      width: 0 !important;
+      height: 0 !important;
+      position: absolute !important;
+      bottom: -9999px !important;
+      z-index: -9999 !important;
+    }
+
     .custom-scroll::-webkit-scrollbar {
       display: none;
     }
@@ -25,7 +46,7 @@
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex justify-center selection:bg-indigo-500 selection:text-white">
 
   <!-- Contenedor móvil -->
-  <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative pb-10">
+  <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative pb-32">
     
     <!-- Cabecera fija -->
     <header class="bg-indigo-600 text-white p-5 pt-8 rounded-b-3xl shadow-md sticky top-0 z-20">
@@ -128,7 +149,6 @@
 
       <!-- VISTA: GYM -->
       <section id="viewGym" class="hidden space-y-4">
-        <!-- Selector de Día de Entrenamiento -->
         <div class="flex space-x-2 p-1 bg-slate-100 rounded-2xl">
           <button id="btnDayPecho" onclick="selectGymRoutine('pecho')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-indigo-600 transition">
             Pecho & Tríceps
@@ -143,7 +163,6 @@
           <span class="text-[11px] text-slate-400 font-medium">Histórico de cargas</span>
         </div>
 
-        <!-- Lista de ejercicios del gym -->
         <div id="gymExerciseList" class="space-y-3"></div>
       </section>
 
@@ -178,9 +197,9 @@
 
     </main>
 
-    <!-- MODAL: Registrar Carga / Peso en Gym -->
-    <div id="gymLogModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-      <div class="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-6 space-y-4">
+    <!-- MODAL GYM: Centrado en la pantalla (lejos de la barra inferior) -->
+    <div id="gymLogModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center">
           <div>
             <span class="text-[10px] uppercase font-bold text-indigo-500 tracking-wider">Añadir Serie</span>
@@ -196,26 +215,26 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-slate-500 mb-1">Peso (kg)</label>
-            <input type="number" step="0.5" id="gymModalWeight" placeholder="0" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
+            <input type="number" step="0.5" id="gymModalWeight" placeholder="0" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
           </div>
           <div>
             <label class="block text-xs font-semibold text-slate-500 mb-1">Reps</label>
-            <input type="number" id="gymModalReps" placeholder="10" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
+            <input type="number" id="gymModalReps" placeholder="10" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
           </div>
         </div>
 
         <div class="flex space-x-2 pt-2">
-          <button onclick="closeGymLogModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
-          <button onclick="saveGymSet()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar Serie</button>
+          <button onclick="closeGymLogModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
+          <button onclick="saveGymSet()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar</button>
         </div>
       </div>
     </div>
 
-    <!-- MODAL: Crear / Editar Rutina Hábitos -->
-    <div id="routineModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-      <div class="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-6 space-y-4">
+    <!-- MODAL HÁBITOS: Centrado en pantalla -->
+    <div id="routineModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center">
-          <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Añadir Rutina Fija</h3>
+          <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Añadir Rutina</h3>
           <button onclick="closeRoutineModal()" class="text-slate-400 hover:text-slate-600 p-1">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
@@ -230,11 +249,11 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Emoji / Icono</label>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Emoji</label>
             <input type="text" id="routineEmojiInput" value="⭐" maxlength="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center text-base focus:outline-none focus:border-indigo-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Franja del día</label>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Franja</label>
             <select id="routineTimeSlotInput" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-indigo-500">
               <option value="morning">🌅 Mañana</option>
               <option value="afternoon">☀️ Tarde</option>
@@ -245,7 +264,7 @@
 
         <div>
           <label class="block text-xs font-semibold text-slate-500 mb-1">Categoría</label>
-          <select id="routineCategoryInput" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-indigo-500">
+          <select id="routineCategoryInput" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-indigo-500">
             <option value="Salud">Salud & Bienestar</option>
             <option value="Productividad">Productividad</option>
             <option value="Mentalidad">Mentalidad</option>
@@ -254,15 +273,15 @@
         </div>
 
         <div class="flex space-x-2 pt-2">
-          <button onclick="closeRoutineModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
-          <button onclick="saveRoutine()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar</button>
+          <button onclick="closeRoutineModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
+          <button onclick="saveRoutine()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar</button>
         </div>
       </div>
     </div>
 
-    <!-- MODAL: Confirmar Borrado -->
-    <div id="deleteModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-2xl w-full max-w-xs p-5 text-center space-y-3">
+    <!-- MODAL BORRAR -->
+    <div id="deleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-3xl w-full max-w-xs p-5 text-center space-y-3 shadow-2xl">
         <div class="w-12 h-12 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto text-xl">
           <i class="fa-solid fa-trash-can"></i>
         </div>
@@ -284,7 +303,21 @@
       });
     }
 
-    // Datos por defecto de Hábitos
+    // Exterminador de badges y widgets de Netlify
+    setInterval(() => {
+      document.querySelectorAll('iframe#netlify-drawer, [data-netlify-deploy-preview], [data-netlify-badge], a[href*="netlify.com"]').forEach(el => {
+        el.remove();
+      });
+      // Buscar elementos flotantes inyectados al final del body
+      Array.from(document.body.children).forEach(child => {
+        if (child.tagName !== 'DIV' || !child.classList.contains('min-h-screen')) {
+          if (child.innerHTML && child.innerHTML.toLowerCase().includes('netlify')) {
+            child.remove();
+          }
+        }
+      });
+    }, 400);
+
     const DEFAULT_MASTER_ROUTINES = [
       { id: '1', title: 'Beber 500ml de agua', emoji: '💧', slot: 'morning', category: 'Salud' },
       { id: '2', title: '10 min de meditación / silencio', emoji: '🧘', slot: 'morning', category: 'Mentalidad' },
@@ -295,7 +328,6 @@
       { id: '7', title: 'Desconectar pantallas 30 min antes', emoji: '🌙', slot: 'night', category: 'Salud' }
     ];
 
-    // Ejercicios de Gimnasio estructurados
     const GYM_ROUTINES = {
       pecho: {
         title: "Día de Pecho & Tríceps",
@@ -451,7 +483,6 @@
       calculateStreak();
     }
 
-    // Funciones de GYM
     function selectGymRoutine(routineKey) {
       currentGymDay = routineKey;
       const isPecho = routineKey === 'pecho';
@@ -497,7 +528,7 @@
               <span class="text-xl bg-indigo-50 p-2 rounded-xl">${ex.icon}</span>
               <h3 class="text-xs font-bold text-slate-800">${ex.name}</h3>
             </div>
-            <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-xl transition active:scale-95 flex items-center space-x-1">
+            <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-xl transition active:scale-95 flex items-center space-x-1">
               <i class="fa-solid fa-plus text-[10px]"></i>
               <span>Añadir</span>
             </button>
