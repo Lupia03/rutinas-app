@@ -31,7 +31,7 @@
     <header class="bg-indigo-600 text-white p-5 pt-8 rounded-b-3xl shadow-md sticky top-0 z-20">
       <div class="flex justify-between items-center mb-3">
         <div>
-          <span class="text-xs uppercase tracking-wider text-indigo-200 font-semibold">Rutina y Hábitos</span>
+          <span class="text-xs uppercase tracking-wider text-indigo-200 font-semibold">Hábitos & Entrenamiento</span>
           <h1 id="currentDateDisplay" class="text-xl font-bold capitalize">Hoy</h1>
         </div>
         <div class="flex items-center space-x-2 bg-indigo-700/60 backdrop-blur px-3 py-1.5 rounded-full border border-indigo-400/30">
@@ -42,9 +42,9 @@
       </div>
 
       <!-- Barra de Progreso Diario -->
-      <div class="mt-4 bg-indigo-900/40 p-3 rounded-2xl backdrop-blur-sm border border-indigo-500/30">
+      <div id="dailyProgressContainer" class="mt-4 bg-indigo-900/40 p-3 rounded-2xl backdrop-blur-sm border border-indigo-500/30">
         <div class="flex justify-between items-center text-xs mb-1.5 font-medium">
-          <span class="text-indigo-100">Progreso completado</span>
+          <span class="text-indigo-100">Progreso de hábitos</span>
           <span id="progressText" class="font-bold text-white">0%</span>
         </div>
         <div class="w-full bg-indigo-950/60 rounded-full h-2.5 overflow-hidden p-0.5">
@@ -52,26 +52,31 @@
         </div>
       </div>
 
-      <!-- Barra de Navegación (Pestañas reubicadas arriba) -->
-      <div class="mt-4 bg-indigo-800/60 p-1 rounded-2xl flex justify-between items-center backdrop-blur-md border border-indigo-400/20">
-        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1.5">
+      <!-- Barra de Navegación Superior -->
+      <div class="mt-4 bg-indigo-800/60 p-1 rounded-2xl flex justify-between items-center backdrop-blur-md border border-indigo-400/20 text-[11px]">
+        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-1.5 font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1">
           <i class="fa-solid fa-calendar-check"></i>
           <span>Hoy</span>
         </button>
 
-        <button onclick="switchTab('manage')" id="nav-manage" class="flex-1 py-2 text-xs font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1.5">
+        <button onclick="switchTab('gym')" id="nav-gym" class="flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-dumbbell"></i>
+          <span>Gym</span>
+        </button>
+
+        <button onclick="switchTab('manage')" id="nav-manage" class="flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1">
           <i class="fa-solid fa-sliders"></i>
           <span>Rutinas</span>
         </button>
 
-        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-2 text-xs font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1.5">
+        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1">
           <i class="fa-solid fa-chart-simple"></i>
           <span>Progreso</span>
         </button>
       </div>
     </header>
 
-    <!-- Selector de fecha (visible solo en la pestaña de Hoy) -->
+    <!-- Selector de fecha (visible solo en Hoy) -->
     <div id="dateSelectorBar" class="flex items-center justify-between px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500">
       <button onclick="changeDay(-1)" class="p-2 hover:bg-slate-200 rounded-full transition active:scale-90">
         <i class="fa-solid fa-chevron-left"></i>
@@ -121,6 +126,27 @@
         </div>
       </section>
 
+      <!-- VISTA: GYM -->
+      <section id="viewGym" class="hidden space-y-4">
+        <!-- Selector de Día de Entrenamiento -->
+        <div class="flex space-x-2 p-1 bg-slate-100 rounded-2xl">
+          <button id="btnDayPecho" onclick="selectGymRoutine('pecho')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-indigo-600 transition">
+            Pecho & Tríceps
+          </button>
+          <button id="btnDayEspalda" onclick="selectGymRoutine('espalda')" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-800 transition">
+            Espalda, Brazo & Hombro
+          </button>
+        </div>
+
+        <div class="flex justify-between items-center px-1">
+          <h2 id="gymRoutineTitle" class="text-sm font-extrabold text-slate-800">Pecho & Tríceps</h2>
+          <span class="text-[11px] text-slate-400 font-medium">Histórico de cargas</span>
+        </div>
+
+        <!-- Lista de ejercicios del gym -->
+        <div id="gymExerciseList" class="space-y-3"></div>
+      </section>
+
       <!-- VISTA: GESTIÓN DE RUTINAS -->
       <section id="viewManage" class="hidden space-y-4">
         <div class="flex justify-between items-center mb-1 px-1">
@@ -141,7 +167,7 @@
       <!-- VISTA: HISTORIAL / PROGRESO -->
       <section id="viewStats" class="hidden space-y-4">
         <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl p-4 text-white">
-          <span class="text-xs text-indigo-200">Resumen de consistencia</span>
+          <span class="text-xs text-indigo-200">Resumen de consistencia de hábitos</span>
           <h3 class="text-2xl font-black mt-1" id="statWeeklyRate">0%</h3>
           <p class="text-xs text-indigo-100 mt-1">Cumplimiento promedio en los últimos 7 días</p>
         </div>
@@ -152,7 +178,40 @@
 
     </main>
 
-    <!-- MODAL: Crear / Editar Rutina -->
+    <!-- MODAL: Registrar Carga / Peso en Gym -->
+    <div id="gymLogModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-6 space-y-4">
+        <div class="flex justify-between items-center">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-indigo-500 tracking-wider">Añadir Serie</span>
+            <h3 id="gymModalExerciseName" class="font-bold text-slate-800 text-base">Ejercicio</h3>
+          </div>
+          <button onclick="closeGymLogModal()" class="text-slate-400 hover:text-slate-600 p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <input type="hidden" id="gymModalExerciseId" value="">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Peso (kg)</label>
+            <input type="number" step="0.5" id="gymModalWeight" placeholder="0" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Reps</label>
+            <input type="number" id="gymModalReps" placeholder="10" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div class="flex space-x-2 pt-2">
+          <button onclick="closeGymLogModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
+          <button onclick="saveGymSet()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar Serie</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Crear / Editar Rutina Hábitos -->
     <div id="routineModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
       <div class="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-6 space-y-4">
         <div class="flex justify-between items-center">
@@ -225,6 +284,7 @@
       });
     }
 
+    // Datos por defecto de Hábitos
     const DEFAULT_MASTER_ROUTINES = [
       { id: '1', title: 'Beber 500ml de agua', emoji: '💧', slot: 'morning', category: 'Salud' },
       { id: '2', title: '10 min de meditación / silencio', emoji: '🧘', slot: 'morning', category: 'Mentalidad' },
@@ -235,9 +295,36 @@
       { id: '7', title: 'Desconectar pantallas 30 min antes', emoji: '🌙', slot: 'night', category: 'Salud' }
     ];
 
+    // Ejercicios de Gimnasio estructurados
+    const GYM_ROUTINES = {
+      pecho: {
+        title: "Día de Pecho & Tríceps",
+        exercises: [
+          { id: "aperturas", name: "Aperturas", icon: "👐" },
+          { id: "pecho_bajo", name: "Pecho Bajo", icon: "📉" },
+          { id: "pecho_superior", name: "Pecho Superior", icon: "📈" },
+          { id: "triceps", name: "Tríceps", icon: "💪" },
+          { id: "abdominales_pecho", name: "Abdominales", icon: "🍫" }
+        ]
+      },
+      espalda: {
+        title: "Día de Espalda, Brazo & Hombro",
+        exercises: [
+          { id: "remo_t", name: "Remo T", icon: "🚣" },
+          { id: "jalon", name: "Jalón", icon: "🧗" },
+          { id: "curl_martillo", name: "Curl Martillo", icon: "🔨" },
+          { id: "biceps", name: "Bíceps", icon: "💪" },
+          { id: "elevacion_hombro", name: "Elevación Hombro", icon: "🦅" },
+          { id: "abdominales_espalda", name: "Abdominales", icon: "🍫" }
+        ]
+      }
+    };
+
     let masterRoutines = JSON.parse(localStorage.getItem('master_routines')) || DEFAULT_MASTER_ROUTINES;
     let daysRecord = JSON.parse(localStorage.getItem('days_record')) || {};
+    let gymRecords = JSON.parse(localStorage.getItem('gym_records')) || {};
     let activeDate = getTodayKey();
+    let currentGymDay = 'pecho';
     let pendingDeleteId = null;
 
     function getTodayKey() {
@@ -258,6 +345,10 @@
 
     function saveRecords() {
       localStorage.setItem('days_record', JSON.stringify(daysRecord));
+    }
+
+    function saveGymRecords() {
+      localStorage.setItem('gym_records', JSON.stringify(gymRecords));
     }
 
     function changeDay(offset) {
@@ -358,6 +449,104 @@
 
       document.getElementById('emptyDailyState').classList.toggle('hidden', totalRoutines > 0);
       calculateStreak();
+    }
+
+    // Funciones de GYM
+    function selectGymRoutine(routineKey) {
+      currentGymDay = routineKey;
+      const isPecho = routineKey === 'pecho';
+      
+      document.getElementById('btnDayPecho').className = `flex-1 py-2 text-xs font-bold rounded-xl transition ${isPecho ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`;
+      document.getElementById('btnDayEspalda').className = `flex-1 py-2 text-xs font-bold rounded-xl transition ${!isPecho ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`;
+      
+      renderGymView();
+    }
+
+    function renderGymView() {
+      const routine = GYM_ROUTINES[currentGymDay];
+      document.getElementById('gymRoutineTitle').innerText = routine.title;
+      const listEl = document.getElementById('gymExerciseList');
+      listEl.innerHTML = '';
+
+      routine.exercises.forEach(ex => {
+        const history = gymRecords[ex.id] || [];
+        const lastEntry = history.length > 0 ? history[history.length - 1] : null;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3';
+        
+        let historyMarkup = '';
+        if (lastEntry) {
+          historyMarkup = `
+            <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+              <span class="text-slate-500 text-[11px]"><i class="fa-regular fa-clock mr-1"></i>Último: ${lastEntry.date}</span>
+              <span class="font-extrabold text-indigo-600">${lastEntry.weight} kg <span class="text-slate-400 font-normal">×</span> ${lastEntry.reps} reps</span>
+            </div>
+          `;
+        } else {
+          historyMarkup = `
+            <div class="text-[11px] text-slate-400 italic bg-slate-50 p-2 rounded-xl text-center">
+              Sin registros todavía
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-xl bg-indigo-50 p-2 rounded-xl">${ex.icon}</span>
+              <h3 class="text-xs font-bold text-slate-800">${ex.name}</h3>
+            </div>
+            <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-xl transition active:scale-95 flex items-center space-x-1">
+              <i class="fa-solid fa-plus text-[10px]"></i>
+              <span>Añadir</span>
+            </button>
+          </div>
+          ${historyMarkup}
+        `;
+        listEl.appendChild(card);
+      });
+    }
+
+    function openGymLogModal(exerciseId, exerciseName) {
+      document.getElementById('gymModalExerciseId').value = exerciseId;
+      document.getElementById('gymModalExerciseName').innerText = exerciseName;
+      
+      const history = gymRecords[exerciseId] || [];
+      const lastEntry = history.length > 0 ? history[history.length - 1] : null;
+      document.getElementById('gymModalWeight').value = lastEntry ? lastEntry.weight : '';
+      document.getElementById('gymModalReps').value = lastEntry ? lastEntry.reps : '';
+      
+      document.getElementById('gymLogModal').classList.remove('hidden');
+    }
+
+    function closeGymLogModal() {
+      document.getElementById('gymLogModal').classList.add('hidden');
+    }
+
+    function saveGymSet() {
+      const exerciseId = document.getElementById('gymModalExerciseId').value;
+      const weight = parseFloat(document.getElementById('gymModalWeight').value) || 0;
+      const reps = parseInt(document.getElementById('gymModalReps').value, 10) || 0;
+
+      if (weight <= 0 && reps <= 0) return;
+
+      if (!gymRecords[exerciseId]) {
+        gymRecords[exerciseId] = [];
+      }
+
+      const today = new Date();
+      const dateStr = `${today.getDate()}/${today.getMonth() + 1}`;
+
+      gymRecords[exerciseId].push({
+        date: dateStr,
+        weight: weight,
+        reps: reps
+      });
+
+      saveGymRecords();
+      closeGymLogModal();
+      renderGymView();
     }
 
     function renderManageView() {
@@ -546,17 +735,20 @@
 
     function switchTab(tab) {
       document.getElementById('viewDaily').classList.toggle('hidden', tab !== 'daily');
+      document.getElementById('viewGym').classList.toggle('hidden', tab !== 'gym');
       document.getElementById('viewManage').classList.toggle('hidden', tab !== 'manage');
       document.getElementById('viewStats').classList.toggle('hidden', tab !== 'stats');
+      
       document.getElementById('dateSelectorBar').classList.toggle('hidden', tab !== 'daily');
+      document.getElementById('dailyProgressContainer').classList.toggle('hidden', tab !== 'daily');
 
-      const tabs = ['daily', 'manage', 'stats'];
+      const tabs = ['daily', 'gym', 'manage', 'stats'];
       tabs.forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
         if (t === tab) {
-          btn.className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1.5';
+          btn.className = 'flex-1 py-1.5 font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1';
         } else {
-          btn.className = 'flex-1 py-2 text-xs font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1.5';
+          btn.className = 'flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1';
         }
       });
 
@@ -565,6 +757,7 @@
 
     function render() {
       renderDailyView();
+      renderGymView();
       renderManageView();
       renderStats();
     }
