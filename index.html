@@ -13,29 +13,6 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-
-    /* Ocultar insignia y barras de Netlify por completo */
-    iframe#netlify-drawer,
-    [data-netlify-deploy-preview],
-    div[class*="netlify"],
-    a[href*="netlify.com"],
-    .netlify-badge {
-      display: none !important;
-      visibility: hidden !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
-      height: 0 !important;
-      width: 0 !important;
-      position: absolute !important;
-      z-index: -9999 !important;
-    }
-
-    /* Asegurar que la barra de navegación siempre quede por encima */
-    nav#bottomNav {
-      z-index: 999999 !important;
-      padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-    }
-
     .custom-scroll::-webkit-scrollbar {
       display: none;
     }
@@ -48,9 +25,9 @@
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex justify-center selection:bg-indigo-500 selection:text-white">
 
   <!-- Contenedor móvil -->
-  <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative pb-28">
+  <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative pb-10">
     
-    <!-- Cabecera -->
+    <!-- Cabecera fija -->
     <header class="bg-indigo-600 text-white p-5 pt-8 rounded-b-3xl shadow-md sticky top-0 z-20">
       <div class="flex justify-between items-center mb-3">
         <div>
@@ -74,10 +51,28 @@
           <div id="progressBar" class="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
         </div>
       </div>
+
+      <!-- Barra de Navegación (Pestañas reubicadas arriba) -->
+      <div class="mt-4 bg-indigo-800/60 p-1 rounded-2xl flex justify-between items-center backdrop-blur-md border border-indigo-400/20">
+        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-calendar-check"></i>
+          <span>Hoy</span>
+        </button>
+
+        <button onclick="switchTab('manage')" id="nav-manage" class="flex-1 py-2 text-xs font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Rutinas</span>
+        </button>
+
+        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-2 text-xs font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-chart-simple"></i>
+          <span>Progreso</span>
+        </button>
+      </div>
     </header>
 
-    <!-- Selector de fecha -->
-    <div class="flex items-center justify-between px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500">
+    <!-- Selector de fecha (visible solo en la pestaña de Hoy) -->
+    <div id="dateSelectorBar" class="flex items-center justify-between px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500">
       <button onclick="changeDay(-1)" class="p-2 hover:bg-slate-200 rounded-full transition active:scale-90">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
@@ -87,7 +82,7 @@
       </button>
     </div>
 
-    <!-- Contenedor Principal -->
+    <!-- Contenido Principal -->
     <main class="flex-1 p-4 overflow-y-auto custom-scroll">
       
       <!-- VISTA: HOY -->
@@ -157,27 +152,9 @@
 
     </main>
 
-    <!-- Barra de Navegación Inferior -->
-    <nav id="bottomNav" class="fixed bottom-0 w-full max-w-md bg-white border-t border-slate-200/80 px-6 pt-2.5 flex justify-around items-center shadow-lg">
-      <button onclick="switchTab('daily')" id="nav-daily" class="flex flex-col items-center text-indigo-600 transition">
-        <i class="fa-solid fa-calendar-check text-lg"></i>
-        <span class="text-[10px] font-bold mt-1">Hoy</span>
-      </button>
-
-      <button onclick="switchTab('manage')" id="nav-manage" class="flex flex-col items-center text-slate-400 hover:text-indigo-600 transition">
-        <i class="fa-solid fa-sliders text-lg"></i>
-        <span class="text-[10px] font-bold mt-1">Rutinas</span>
-      </button>
-
-      <button onclick="switchTab('stats')" id="nav-stats" class="flex flex-col items-center text-slate-400 hover:text-indigo-600 transition">
-        <i class="fa-solid fa-chart-simple text-lg"></i>
-        <span class="text-[10px] font-bold mt-1">Progreso</span>
-      </button>
-    </nav>
-
     <!-- MODAL: Crear / Editar Rutina -->
     <div id="routineModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
-      <div class="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-6 space-y-4 animate-in slide-in-from-bottom">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-6 space-y-4">
         <div class="flex justify-between items-center">
           <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Añadir Rutina Fija</h3>
           <button onclick="closeRoutineModal()" class="text-slate-400 hover:text-slate-600 p-1">
@@ -571,10 +548,17 @@
       document.getElementById('viewDaily').classList.toggle('hidden', tab !== 'daily');
       document.getElementById('viewManage').classList.toggle('hidden', tab !== 'manage');
       document.getElementById('viewStats').classList.toggle('hidden', tab !== 'stats');
+      document.getElementById('dateSelectorBar').classList.toggle('hidden', tab !== 'daily');
 
-      document.getElementById('nav-daily').className = tab === 'daily' ? 'flex flex-col items-center text-indigo-600 transition' : 'flex flex-col items-center text-slate-400 hover:text-indigo-600 transition';
-      document.getElementById('nav-manage').className = tab === 'manage' ? 'flex flex-col items-center text-indigo-600 transition' : 'flex flex-col items-center text-slate-400 hover:text-indigo-600 transition';
-      document.getElementById('nav-stats').className = tab === 'stats' ? 'flex flex-col items-center text-indigo-600 transition' : 'flex flex-col items-center text-slate-400 hover:text-indigo-600 transition';
+      const tabs = ['daily', 'manage', 'stats'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        if (t === tab) {
+          btn.className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1.5';
+        } else {
+          btn.className = 'flex-1 py-2 text-xs font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1.5';
+        }
+      });
 
       render();
     }
