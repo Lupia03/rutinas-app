@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#4f46e5">
+  <title>Mi Rutina Diaria</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scroll {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex justify-center selection:bg-indigo-500 selection:text-white">
+
+  <!-- Contenedor móvil -->
+  <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative pb-24">
+    
+    <!-- Cabecera -->
+    <header class="bg-indigo-600 text-white p-5 pt-8 rounded-b-3xl shadow-md sticky top-0 z-20">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <span class="text-xs uppercase tracking-wider text-indigo-200 font-semibold">Rutina y Hábitos</span>
+          <h1 id="currentDateDisplay" class="text-xl font-bold capitalize">Hoy</h1>
+        </div>
+        <div class="flex items-center space-x-2 bg-indigo-700/60 backdrop-blur px-3 py-1.5 rounded-full border border-indigo-400/30">
+          <span class="text-amber-400 text-sm">🔥</span>
+          <span id="streakCount" class="font-extrabold text-sm text-white">0</span>
+          <span class="text-xs text-indigo-200">días</span>
+        </div>
+      </div>
+
+      <!-- Barra de Progreso Diario -->
+      <div class="mt-4 bg-indigo-900/40 p-3 rounded-2xl backdrop-blur-sm border border-indigo-500/30">
+        <div class="flex justify-between items-center text-xs mb-1.5 font-medium">
+          <span class="text-indigo-100">Progreso completado</span>
+          <span id="progressText" class="font-bold text-white">0%</span>
+        </div>
+        <div class="w-full bg-indigo-950/60 rounded-full h-2.5 overflow-hidden p-0.5">
+          <div id="progressBar" class="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Selector de fecha rápida -->
+    <div class="flex items-center justify-between px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500">
+      <button onclick="changeDay(-1)" class="p-2 hover:bg-slate-200 rounded-full transition active:scale-90">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <span id="viewingDateLabel" class="text-slate-700 font-bold tracking-wide">Día actual</span>
+      <button onclick="changeDay(1)" class="p-2 hover:bg-slate-200 rounded-full transition active:scale-90">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Contenedor Principal (Vistas) -->
+    <main class="flex-1 p-4 overflow-y-auto custom-scroll">
+      
+      <!-- VISTA: HOY (Rutinas del día) -->
+      <section id="viewDaily" class="space-y-6">
+        
+        <!-- Franja Mañana -->
+        <div>
+          <div class="flex items-center space-x-2 text-amber-600 font-bold text-sm mb-2.5 px-1">
+            <span>🌅</span>
+            <h2>Mañana</h2>
+            <span id="badge-morning" class="text-[11px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium ml-auto">0/0</span>
+          </div>
+          <div id="list-morning" class="space-y-2"></div>
+        </div>
+
+        <!-- Franja Tarde -->
+        <div>
+          <div class="flex items-center space-x-2 text-indigo-600 font-bold text-sm mb-2.5 px-1">
+            <span>☀️</span>
+            <h2>Tarde</h2>
+            <span id="badge-afternoon" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium ml-auto">0/0</span>
+          </div>
+          <div id="list-afternoon" class="space-y-2"></div>
+        </div>
+
+        <!-- Franja Noche -->
+        <div>
+          <div class="flex items-center space-x-2 text-purple-600 font-bold text-sm mb-2.5 px-1">
+            <span>🌙</span>
+            <h2>Noche</h2>
+            <span id="badge-night" class="text-[11px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium ml-auto">0/0</span>
+          </div>
+          <div id="list-night" class="space-y-2"></div>
+        </div>
+
+        <!-- Estado vacío si no hay hábitos -->
+        <div id="emptyDailyState" class="hidden text-center py-12 px-4">
+          <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-slate-400">📝</div>
+          <p class="text-slate-600 font-medium text-sm">No tienes rutinas añadidas todavía.</p>
+          <button onclick="switchTab('manage')" class="mt-3 text-indigo-600 text-xs font-bold underline">Configurar rutinas fijas</button>
+        </div>
+      </section>
+
+      <!-- VISTA: GESTIÓN DE RUTINAS (Añadir / Editar / Borrar) -->
+      <section id="viewManage" class="hidden space-y-4">
+        <div class="flex justify-between items-center mb-1 px-1">
+          <div>
+            <h2 class="text-base font-bold text-slate-800">Gestionar Plantilla</h2>
+            <p class="text-xs text-slate-400">Estas rutinas aparecerán todos los días de forma automática.</p>
+          </div>
+        </div>
+
+        <button onclick="openRoutineModal()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 flex items-center justify-center space-x-2 active:scale-[0.98] transition">
+          <i class="fa-solid fa-plus text-sm"></i>
+          <span>Nueva Rutina Fija</span>
+        </button>
+
+        <!-- Lista de configuración -->
+        <div id="manageRoutinesList" class="space-y-2.5 pt-2"></div>
+      </section>
+
+      <!-- VISTA: HISTORIAL / ESTADÍSTICAS -->
+      <section id="viewStats" class="hidden space-y-4">
+        <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl p-4 text-white">
+          <span class="text-xs text-indigo-200">Resumen de consistencia</span>
+          <h3 class="text-2xl font-black mt-1" id="statWeeklyRate">0%</h3>
+          <p class="text-xs text-indigo-100 mt-1">Cumplimiento promedio en los últimos 7 días</p>
+        </div>
+
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">Últimos 14 días</h3>
+        <div id="historyList" class="space-y-2"></div>
+      </section>
+
+    </main>
+
+    <!-- Barra de Navegación Inferior Móvil -->
+    <nav class="fixed bottom-0 w-full max-w-md bg-white border-t border-slate-100 px-6 py-2.5 flex justify-around items-center z-30">
+      <button onclick="switchTab('daily')" id="nav-daily" class="flex flex-col items-center text-indigo-600 transition">
+        <i class="fa-solid fa-calendar-check text-lg"></i>
+        <span class="text-[10px] font-bold mt-1">Hoy</span>
+      </button>
+
+      <button onclick="switchTab('manage')" id="nav-manage" class="flex flex-col items-center text-slate-400 hover:text-indigo-600 transition">
+        <i class="fa-solid fa-sliders text-lg"></i>
+        <span class="text-[10px] font-bold mt-1">Rutinas</span>
+      </button>
+
+      <button onclick="switchTab('stats')" id="nav-stats" class="flex flex-col items-center text-slate-400 hover:text-indigo-600 transition">
+        <i class="fa-solid fa-chart-simple text-lg"></i>
+        <span class="text-[10px] font-bold mt-1">Progreso</span>
+      </button>
+    </nav>
+
+    <!-- MODAL: Crear / Editar Rutina -->
+    <div id="routineModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 hidden">
+      <div class="bg-white rounded-t-3xl sm:rounded-2xl w-full max-w-sm p-6 space-y-4 animate-in slide-in-from-bottom">
+        <div class="flex justify-between items-center">
+          <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Añadir Rutina Fija</h3>
+          <button onclick="closeRoutineModal()" class="text-slate-400 hover:text-slate-600 p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <input type="hidden" id="editRoutineId" value="">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre de la tarea</label>
+          <input type="text" id="routineNameInput" placeholder="Ej: Beber 2 vasos de agua" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 font-medium">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Emoji / Icono</label>
+            <input type="text" id="routineEmojiInput" value="⭐" maxlength="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center text-base focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Franja del día</label>
+            <select id="routineTimeSlotInput" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-indigo-500">
+              <option value="morning">🌅 Mañana</option>
+              <option value="afternoon">☀️ Tarde</option>
+              <option value="night">🌙 Noche</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Categoría</label>
+          <select id="routineCategoryInput" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-indigo-500">
+            <option value="Salud">Salud & Bienestar</option>
+            <option value="Productividad">Productividad</option>
+            <option value="Mentalidad">Mentalidad</option>
+            <option value="Personal">Personal</option>
+          </select>
+        </div>
+
+        <div class="flex space-x-2 pt-2">
+          <button onclick="closeRoutineModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
+          <button onclick="saveRoutine()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Confirmar Borrado -->
+    <div id="deleteModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-2xl w-full max-w-xs p-5 text-center space-y-3">
+        <div class="w-12 h-12 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto text-xl">
+          <i class="fa-solid fa-trash-can"></i>
+        </div>
+        <h4 class="font-bold text-slate-800 text-sm">¿Eliminar esta rutina?</h4>
+        <p class="text-xs text-slate-500">Ya no aparecerá en tus días futuros.</p>
+        <div class="flex space-x-2 pt-1">
+          <button onclick="closeDeleteModal()" class="flex-1 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">Cancelar</button>
+          <button id="btnConfirmDelete" class="flex-1 py-2 bg-rose-500 text-white text-xs font-bold rounded-xl shadow-md shadow-rose-100">Eliminar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Configuración base de rutinas fijas iniciales
+    const DEFAULT_MASTER_ROUTINES = [
+      { id: '1', title: 'Beber 500ml de agua', emoji: '💧', slot: 'morning', category: 'Salud' },
+      { id: '2', title: '10 min de meditación / silencio', emoji: '🧘', slot: 'morning', category: 'Mentalidad' },
+      { id: '3', title: 'Planificar el día', emoji: '📋', slot: 'morning', category: 'Productividad' },
+      { id: '4', title: 'Paseo o 30 min de ejercicio', emoji: '🏃', slot: 'afternoon', category: 'Salud' },
+      { id: '5', title: 'Revisar pendientes terminados', emoji: '✅', slot: 'afternoon', category: 'Productividad' },
+      { id: '6', title: 'Leer 15 páginas', emoji: '📖', slot: 'night', category: 'Mentalidad' },
+      { id: '7', title: 'Desconectar pantallas 30 min antes', emoji: '🌙', slot: 'night', category: 'Salud' }
+    ];
+
+    let masterRoutines = JSON.parse(localStorage.getItem('master_routines')) || DEFAULT_MASTER_ROUTINES;
+    let daysRecord = JSON.parse(localStorage.getItem('days_record')) || {};
+    let activeDate = getTodayKey();
+    let pendingDeleteId = null;
+
+    function getTodayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function initDayData(dateKey) {
+      if (!daysRecord[dateKey]) {
+        daysRecord[dateKey] = {
+          completedIds: {},
+          timestamps: {}
+        };
+        saveRecords();
+      }
+    }
+
+    function saveMasters() {
+      localStorage.setItem('master_routines', JSON.stringify(masterRoutines));
+    }
+
+    function saveRecords() {
+      localStorage.setItem('days_record', JSON.stringify(daysRecord));
+    }
+
+    function changeDay(offset) {
+      const parts = activeDate.split('-');
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      d.setDate(d.getDate() + offset);
+      activeDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      render();
+    }
+
+    function toggleCheck(id) {
+      initDayData(activeDate);
+      const isDone = !!daysRecord[activeDate].completedIds[id];
+      if (isDone) {
+        delete daysRecord[activeDate].completedIds[id];
+        delete daysRecord[activeDate].timestamps[id];
+      } else {
+        daysRecord[activeDate].completedIds[id] = true;
+        const now = new Date();
+        daysRecord[activeDate].timestamps[id] = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      }
+      saveRecords();
+      render();
+    }
+
+    function renderDailyView() {
+      initDayData(activeDate);
+      const todayKey = getTodayKey();
+      
+      const parts = activeDate.split('-');
+      const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+      const options = { weekday: 'long', day: 'numeric', month: 'short' };
+      const dateFormatted = dateObj.toLocaleDateString('es-ES', options);
+
+      document.getElementById('currentDateDisplay').innerText = activeDate === todayKey ? 'Hoy' : dateFormatted;
+      document.getElementById('viewingDateLabel').innerText = activeDate === todayKey ? `Hoy, ${dateFormatted}` : dateFormatted;
+
+      const currentDayData = daysRecord[activeDate];
+      const slots = ['morning', 'afternoon', 'night'];
+      let totalCompleted = 0;
+
+      slots.forEach(slot => {
+        const listEl = document.getElementById(`list-${slot}`);
+        const badgeEl = document.getElementById(`badge-${slot}`);
+        const routinesInSlot = masterRoutines.filter(r => r.slot === slot);
+
+        listEl.innerHTML = '';
+        let completedInSlot = 0;
+
+        routinesInSlot.forEach(routine => {
+          const isDone = !!currentDayData.completedIds[routine.id];
+          if (isDone) {
+            completedInSlot++;
+            totalCompleted++;
+          }
+          const time = currentDayData.timestamps[routine.id] || '';
+
+          const item = document.createElement('div');
+          item.className = `flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+            isDone 
+              ? 'bg-emerald-50/50 border-emerald-200/60 shadow-sm' 
+              : 'bg-white border-slate-200/70 hover:border-indigo-200 shadow-sm'
+          }`;
+
+          item.innerHTML = `
+            <div class="flex items-center space-x-3.5 flex-1 cursor-pointer" onclick="toggleCheck('${routine.id}')">
+              <button class="w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
+                isDone 
+                  ? 'bg-emerald-500 border-emerald-500 text-white' 
+                  : 'border-slate-300 bg-slate-50'
+              }">
+                ${isDone ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+              </button>
+              <div>
+                <p class="text-xs font-bold leading-tight ${isDone ? 'line-through text-slate-400' : 'text-slate-800'}">
+                  ${routine.emoji} ${routine.title}
+                </p>
+                <div class="flex items-center space-x-2 mt-0.5">
+                  <span class="text-[10px] text-slate-400 font-medium">${routine.category}</span>
+                  ${isDone ? `<span class="text-[10px] text-emerald-600 font-semibold">• Hecho ${time}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <button onclick="editRoutineFromDaily('${routine.id}')" class="p-1.5 text-slate-300 hover:text-indigo-600 active:scale-90 transition">
+              <i class="fa-solid fa-pen text-xs"></i>
+            </button>
+          `;
+          listEl.appendChild(item);
+        });
+
+        badgeEl.innerText = `${completedInSlot}/${routinesInSlot.length}`;
+      });
+
+      const totalRoutines = masterRoutines.length;
+      const pct = totalRoutines === 0 ? 0 : Math.round((totalCompleted / totalRoutines) * 100);
+      document.getElementById('progressBar').style.width = `${pct}%`;
+      document.getElementById('progressText').innerText = `${pct}%`;
+
+      document.getElementById('emptyDailyState').classList.toggle('hidden', totalRoutines > 0);
+      calculateStreak();
+    }
+
+    function renderManageView() {
+      const list = document.getElementById('manageRoutinesList');
+      list.innerHTML = '';
+
+      masterRoutines.forEach(routine => {
+        const slotLabels = { morning: 'Mañana', afternoon: 'Tarde', night: 'Noche' };
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80';
+        row.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="text-xl bg-white p-2 rounded-xl shadow-xs border border-slate-100">${routine.emoji}</span>
+            <div>
+              <p class="text-xs font-bold text-slate-800">${routine.title}</p>
+              <div class="flex items-center space-x-2 text-[10px] text-slate-400 font-medium">
+                <span>${slotLabels[routine.slot]}</span>
+                <span>•</span>
+                <span>${routine.category}</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-1">
+            <button onclick="openRoutineModal('${routine.id}')" class="p-2 text-slate-400 hover:text-indigo-600 active:scale-90 transition">
+              <i class="fa-solid fa-pen text-xs"></i>
+            </button>
+            <button onclick="promptDelete('${routine.id}')" class="p-2 text-slate-400 hover:text-rose-500 active:scale-90 transition">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function openRoutineModal(id = null) {
+      const modal = document.getElementById('routineModal');
+      const title = document.getElementById('modalTitle');
+      const editId = document.getElementById('editRoutineId');
+      const nameInput = document.getElementById('routineNameInput');
+      const emojiInput = document.getElementById('routineEmojiInput');
+      const slotInput = document.getElementById('routineTimeSlotInput');
+      const catInput = document.getElementById('routineCategoryInput');
+
+      if (id) {
+        const r = masterRoutines.find(x => x.id === id);
+        title.innerText = 'Editar Rutina';
+        editId.value = r.id;
+        nameInput.value = r.title;
+        emojiInput.value = r.emoji;
+        slotInput.value = r.slot;
+        catInput.value = r.category;
+      } else {
+        title.innerText = 'Nueva Rutina Fija';
+        editId.value = '';
+        nameInput.value = '';
+        emojiInput.value = '⭐';
+        slotInput.value = 'morning';
+        catInput.value = 'Salud';
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function editRoutineFromDaily(id) {
+      openRoutineModal(id);
+    }
+
+    function closeRoutineModal() {
+      document.getElementById('routineModal').classList.add('hidden');
+    }
+
+    function saveRoutine() {
+      const id = document.getElementById('editRoutineId').value;
+      const title = document.getElementById('routineNameInput').value.trim();
+      const emoji = document.getElementById('routineEmojiInput').value.trim() || '⭐';
+      const slot = document.getElementById('routineTimeSlotInput').value;
+      const category = document.getElementById('routineCategoryInput').value;
+
+      if (!title) return;
+
+      if (id) {
+        const item = masterRoutines.find(x => x.id === id);
+        if (item) {
+          item.title = title;
+          item.emoji = emoji;
+          item.slot = slot;
+          item.category = category;
+        }
+      } else {
+        masterRoutines.push({
+          id: Date.now().toString(),
+          title,
+          emoji,
+          slot,
+          category
+        });
+      }
+
+      saveMasters();
+      closeRoutineModal();
+      render();
+    }
+
+    function promptDelete(id) {
+      pendingDeleteId = id;
+      document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+      pendingDeleteId = null;
+      document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    document.getElementById('btnConfirmDelete').addEventListener('click', () => {
+      if (pendingDeleteId) {
+        masterRoutines = masterRoutines.filter(r => r.id !== pendingDeleteId);
+        saveMasters();
+        closeDeleteModal();
+        render();
+      }
+    });
+
+    function calculateStreak() {
+      let streak = 0;
+      let curr = new Date();
+      
+      while (true) {
+        const key = `${curr.getFullYear()}-${String(curr.getMonth()+1).padStart(2,'0')}-${String(curr.getDate()).padStart(2,'0')}`;
+        const rec = daysRecord[key];
+        
+        if (rec && masterRoutines.length > 0) {
+          const completedCount = Object.keys(rec.completedIds || {}).length;
+          const ratio = completedCount / masterRoutines.length;
+          if (ratio >= 0.6) {
+            streak++;
+            curr.setDate(curr.getDate() - 1);
+          } else {
+            break;
+          }
+        } else {
+          break;
+        }
+      }
+      document.getElementById('streakCount').innerText = streak;
+    }
+
+    function renderStats() {
+      const historyEl = document.getElementById('historyList');
+      historyEl.innerHTML = '';
+
+      let totalPct = 0;
+      let countedDays = 0;
+
+      for (let i = 0; i < 14; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const rec = daysRecord[key] || { completedIds: {} };
+
+        const total = masterRoutines.length;
+        const done = Object.keys(rec.completedIds || {}).length;
+        const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+        if (i < 7) {
+          totalPct += pct;
+          countedDays++;
+        }
+
+        const dateTitle = i === 0 ? 'Hoy' : (i === 1 ? 'Ayer' : d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }));
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs';
+        row.innerHTML = `
+          <span class="font-bold text-slate-700 capitalize">${dateTitle}</span>
+          <div class="flex items-center space-x-3">
+            <span class="text-slate-400 font-medium">${done}/${total} hechas</span>
+            <span class="font-extrabold ${pct >= 80 ? 'text-emerald-500' : (pct >= 40 ? 'text-amber-500' : 'text-slate-400')}">${pct}%</span>
+          </div>
+        `;
+        historyEl.appendChild(row);
+      }
+
+      const avg = countedDays > 0 ? Math.round(totalPct / countedDays) : 0;
+      document.getElementById('statWeeklyRate').innerText = `${avg}%`;
+    }
+
+    function switchTab(tab) {
+      document.getElementById('viewDaily').classList.toggle('hidden', tab !== 'daily');
+      document.getElementById('viewManage').classList.toggle('hidden', tab !== 'manage');
+      document.getElementById('viewStats').classList.toggle('hidden', tab !== 'stats');
+
+      document.getElementById('nav-daily').className = tab === 'daily' ? 'flex flex-col items-center text-indigo-600 transition' : 'flex flex-col items-center text-slate-400 hover:text-indigo-600 transition';
+      document.getElementById('nav-manage').className = tab === 'manage' ? 'flex flex-col items-center text-indigo-600 transition' : 'flex flex-col items-center text-slate-400 hover:text-indigo-600 transition';
+      document.getElementById('nav-stats').className = tab === 'stats' ? 'flex flex-col items-center text-indigo-600 transition' : 'flex flex-col items-center text-slate-400 hover:text-indigo-600 transition';
+
+      render();
+    }
+
+    function render() {
+      renderDailyView();
+      renderManageView();
+      renderStats();
+    }
+
+    render();
+  </script>
+</body>
+</html>
