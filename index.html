@@ -3,41 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#09090b">
-  <title>Elite Routine & Gym Tracker</title>
+  <meta name="theme-color" content="#060608">
+  <title>Inazuma & Poké Tracker Pro</title>
   <link rel="manifest" href="manifest.json">
+  
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Chakra Petch (HUD Anime) & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Librería Profesional: Canvas Confetti (Efectos de Victoria) -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Librería Profesional: Chart.js (Radar de Estadísticas estilo Inazuma/Pokémon) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            hud: ['"Chakra Petch"', 'sans-serif'],
+            sans: ['"Inter"', 'sans-serif']
+          },
           colors: {
-            gold: {
+            volt: {
               300: '#fde047',
               400: '#facc15',
               500: '#eab308',
               600: '#ca8a04',
             },
-            dark: {
-              900: '#09090b',
-              850: '#121215',
-              800: '#18181b',
-              750: '#202024',
-              700: '#27272a'
+            pitch: {
+              950: '#060609',
+              900: '#0b0b10',
+              850: '#12121a',
+              800: '#1a1a24',
+              750: '#242432'
             }
           }
         }
       }
     }
   </script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      font-family: 'Inter', sans-serif;
     }
-    /* Ocultar cualquier inyección externa o banners residuales */
+    .font-hud {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    /* Bloqueo total de banners externos de Netlify */
     iframe#netlify-drawer,
     [data-netlify-deploy-preview],
     [data-netlify-badge],
@@ -54,6 +80,28 @@
       bottom: -9999px !important;
       z-index: -9999 !important;
     }
+
+    /* Resplandor Eléctrico */
+    .volt-glow {
+      box-shadow: 0 0 18px -3px rgba(250, 204, 21, 0.4);
+    }
+
+    /* Renderizado nítido para Pixel Art de Pokémon */
+    .pixelated {
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    /* Animación flotante suave para el compañero */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    .animate-float {
+      animation: floatSlow 2.8s ease-in-out infinite;
+    }
+
     .custom-scroll::-webkit-scrollbar {
       display: none;
     }
@@ -63,237 +111,351 @@
     }
   </style>
 </head>
-<body class="bg-zinc-100 dark:bg-dark-900 text-zinc-900 dark:text-zinc-100 antialiased min-h-screen flex justify-center transition-colors duration-300">
+<body class="bg-zinc-100 dark:bg-pitch-950 text-zinc-900 dark:text-zinc-100 antialiased min-h-screen flex justify-center transition-colors duration-300">
 
-  <!-- Contenedor móvil -->
-  <div class="w-full max-w-md bg-white dark:bg-dark-850 min-h-screen shadow-2xl flex flex-col relative pb-16 border-x border-zinc-200 dark:border-zinc-800/80 transition-colors duration-300">
+  <!-- Contenedor Móvil Estilo Consola Pro -->
+  <div class="w-full max-w-md bg-zinc-50 dark:bg-pitch-900 min-h-screen shadow-2xl flex flex-col relative pb-24 border-x border-zinc-200 dark:border-zinc-800/80">
     
-    <!-- Cabecera Premium -->
-    <header class="bg-gradient-to-b from-zinc-900 via-dark-850 to-dark-800 text-white p-5 pt-8 rounded-b-3xl shadow-xl border-b border-gold-500/20 sticky top-0 z-30">
-      <div class="flex justify-between items-center mb-3">
-        <div>
-          <span class="text-[10px] uppercase tracking-widest text-gold-400 font-extrabold flex items-center gap-1.5">
-            <span class="inline-block w-1.5 h-1.5 rounded-full bg-gold-400 shadow-[0_0_8px_#facc15]"></span>
-            Elite Tracker
-          </span>
-          <h1 id="currentDateDisplay" class="text-xl font-black capitalize tracking-tight text-white mt-0.5">Hoy</h1>
-        </div>
-        
-        <div class="flex items-center space-x-2">
-          <!-- Racha -->
-          <div class="flex items-center space-x-1.5 bg-dark-900/80 border border-gold-500/30 px-3 py-1.5 rounded-full shadow-inner">
-            <span class="text-gold-400 text-xs">⚡</span>
-            <span id="streakCount" class="font-black text-sm text-gold-400">0</span>
-            <span class="text-[10px] text-zinc-400 uppercase font-semibold">días</span>
+    <!-- CABECERA: HUD DE ENTRENADOR & COMPAÑERO POKÉMON -->
+    <header class="bg-pitch-950 text-white p-4 pt-6 rounded-b-[2.2rem] shadow-2xl border-b-2 border-volt-400/50 sticky top-0 z-30 relative overflow-hidden">
+      <!-- Fondo técnico sutil -->
+      <div class="absolute -right-8 -top-8 text-volt-400/5 text-9xl pointer-events-none rotate-12">
+        <i class="fa-solid fa-bolt"></i>
+      </div>
+
+      <!-- Fila Superior: Compañero Pokémon Activo + Nivel + Racha -->
+      <div class="flex justify-between items-center relative z-10">
+        <div class="flex items-center space-x-3">
+          <!-- Avatar Pokémon Interactivo -->
+          <button onclick="switchTab('partners')" class="relative group focus:outline-none">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-volt-400 via-amber-500 to-yellow-600 p-0.5 shadow-lg volt-glow flex items-center justify-center transition transform group-active:scale-90">
+              <div class="w-full h-full bg-pitch-900 rounded-[14px] flex items-center justify-center relative overflow-hidden">
+                <!-- Destello interior -->
+                <div class="absolute inset-0 bg-radial from-volt-400/20 to-transparent"></div>
+                <img id="headerPartnerSprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Partner" class="w-11 h-11 object-contain pixelated animate-float z-10">
+              </div>
+            </div>
+            <!-- Insignia de Nivel sobre el Pokémon -->
+            <span class="absolute -bottom-1.5 -right-1.5 bg-volt-400 text-pitch-950 font-hud font-black text-[10px] px-1.5 py-0.2 rounded-md border border-pitch-950 shadow">
+              NV.<span id="playerLevel">1</span>
+            </span>
+          </button>
+
+          <div>
+            <div class="flex items-center space-x-1.5">
+              <span id="playerRankBadge" class="text-[9px] font-hud uppercase tracking-wider px-2 py-0.5 rounded bg-volt-400/15 text-volt-400 border border-volt-400/30 font-bold">
+                ⚡ Canterano Raimon
+              </span>
+              <span id="currentDateDisplay" class="text-[10px] text-zinc-400 font-semibold capitalize">• Hoy</span>
+            </div>
+            <h1 class="text-base font-hud font-bold uppercase tracking-wide text-white mt-0.5 flex items-center gap-1.5">
+              <span id="headerPartnerName" class="text-volt-400">Pikachu</span>
+              <span class="text-xs text-zinc-500 font-normal">•</span>
+              <span id="headerPartnerTitle" class="text-xs text-zinc-300 font-semibold">Compañero</span>
+            </h1>
           </div>
-          <!-- Botón Modo Oscuro / Claro -->
-          <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-dark-750 hover:bg-dark-700 border border-zinc-700/60 flex items-center justify-center text-gold-400 text-xs transition active:scale-90" title="Cambiar tema">
+        </div>
+
+        <div class="flex items-center space-x-1.5">
+          <!-- Racha -->
+          <div class="flex items-center space-x-1 bg-pitch-850 border border-volt-400/40 px-2.5 py-1.5 rounded-xl">
+            <span class="text-volt-400 text-xs animate-pulse">🔥</span>
+            <span id="streakCount" class="font-hud font-black text-sm text-volt-400">0</span>
+          </div>
+          <!-- Tema Oscuro / Claro -->
+          <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-xl bg-pitch-800 hover:bg-pitch-750 border border-zinc-700/70 flex items-center justify-center text-volt-400 text-xs transition active:scale-90">
             <i id="themeIcon" class="fa-solid fa-moon"></i>
           </button>
         </div>
       </div>
 
-      <!-- Barra de Progreso Diario de Hábitos -->
-      <div id="dailyProgressContainer" class="mt-3 bg-dark-900/60 p-3 rounded-2xl border border-zinc-800/90 shadow-sm">
-        <div class="flex justify-between items-center text-xs mb-1.5 font-medium">
-          <span class="text-zinc-400 text-[11px] font-semibold">Objetivos del día</span>
-          <span id="progressText" class="font-extrabold text-gold-400">0%</span>
+      <!-- Barras de Estado (Energía del Partido & EXP de Evolución) -->
+      <div id="dailyProgressContainer" class="mt-3.5 bg-pitch-900/90 p-3 rounded-2xl border border-zinc-800/90 relative z-10 space-y-2 backdrop-blur-md">
+        <!-- Barra 1: Misiones de Hoy -->
+        <div>
+          <div class="flex justify-between items-center text-[10px] font-hud uppercase tracking-wider mb-1">
+            <span class="text-zinc-300 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-futbol text-volt-400 text-[10px]"></i> Sincronización Diaria
+            </span>
+            <span id="progressText" class="font-black text-volt-400">0%</span>
+          </div>
+          <div class="w-full bg-pitch-950 rounded-full h-2.5 overflow-hidden p-0.5 border border-zinc-800">
+            <div id="progressBar" class="bg-gradient-to-r from-amber-500 via-volt-400 to-yellow-200 h-full rounded-full transition-all duration-500 ease-out volt-glow" style="width: 0%"></div>
+          </div>
         </div>
-        <div class="w-full bg-dark-800 rounded-full h-2 overflow-hidden p-0.5 border border-zinc-700/50">
-          <div id="progressBar" class="bg-gradient-to-r from-yellow-500 via-gold-400 to-amber-300 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 0%"></div>
+
+        <!-- Barra 2: EXP para Desbloquear Siguiente Pokémon -->
+        <div class="pt-1 border-t border-zinc-800/80 flex items-center justify-between text-[9px] font-hud text-zinc-400">
+          <span>EXP TOTAL: <strong id="totalXpDisplay" class="text-volt-400">0</strong> PTS</span>
+          <div class="flex items-center space-x-2 w-1/2">
+            <div class="w-full bg-pitch-950 rounded-full h-1.5 overflow-hidden border border-zinc-800">
+              <div id="xpBar" class="bg-sky-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <span id="nextLevelXp" class="text-[9px] text-sky-400 font-bold">0/100</span>
+          </div>
         </div>
       </div>
 
-      <!-- Barra de Navegación Superior Estilo Cápsula -->
-      <div class="mt-4 bg-dark-900/90 p-1.5 rounded-2xl flex justify-between items-center border border-zinc-800 text-[11px] font-bold">
-        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-1.5 rounded-xl bg-gold-400 text-black shadow-md shadow-gold-500/20 transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-check"></i>
+      <!-- NAVEGACIÓN TÁCTICA (5 PESTAÑAS) -->
+      <div class="mt-3.5 bg-pitch-900 p-1 rounded-xl flex justify-between items-center border border-zinc-800 text-[10px] font-hud font-bold uppercase tracking-wider relative z-10">
+        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-1.5 rounded-lg bg-volt-400 text-pitch-950 shadow-md volt-glow font-black transition-all flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-bolt"></i>
           <span>Hoy</span>
         </button>
 
-        <button onclick="switchTab('gym')" id="nav-gym" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
+        <button onclick="switchTab('gym')" id="nav-gym" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-volt-300 transition-all flex items-center justify-center space-x-1">
           <i class="fa-solid fa-dumbbell"></i>
           <span>Gym</span>
         </button>
 
-        <button onclick="switchTab('bodyweight')" id="nav-bodyweight" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
+        <button onclick="switchTab('partners')" id="nav-partners" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-volt-300 transition-all flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-paw"></i>
+          <span>Equipo</span>
+        </button>
+
+        <button onclick="switchTab('bodyweight')" id="nav-bodyweight" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-volt-300 transition-all flex items-center justify-center space-x-1">
           <i class="fa-solid fa-weight-scale"></i>
-          <span>Peso</span>
+          <span>Físico</span>
         </button>
 
-        <button onclick="switchTab('manage')" id="nav-manage" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-sliders"></i>
-          <span>Rutinas</span>
-        </button>
-
-        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-chart-line"></i>
-          <span>Datos</span>
+        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-volt-300 transition-all flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Ficha</span>
         </button>
       </div>
     </header>
 
-    <!-- Selector de fecha (visible solo en Hoy) -->
-    <div id="dateSelectorBar" class="flex items-center justify-between px-6 py-2.5 bg-zinc-50 dark:bg-dark-900 border-b border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-      <button onclick="changeDay(-1)" class="p-2 hover:bg-zinc-200 dark:hover:bg-dark-800 rounded-full transition active:scale-90">
-        <i class="fa-solid fa-chevron-left"></i>
+    <!-- Selector de Jornada / Fecha (visible en Hoy) -->
+    <div id="dateSelectorBar" class="flex items-center justify-between px-5 py-2 bg-zinc-100 dark:bg-pitch-850 border-b border-zinc-200 dark:border-zinc-800 text-xs font-hud uppercase tracking-wider">
+      <button onclick="changeDay(-1)" class="w-7 h-7 flex items-center justify-center bg-white dark:bg-pitch-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-volt-500 active:scale-90 transition">
+        <i class="fa-solid fa-chevron-left text-[10px]"></i>
       </button>
-      <span id="viewingDateLabel" class="text-zinc-800 dark:text-zinc-200 font-bold tracking-wide">Día actual</span>
-      <button onclick="changeDay(1)" class="p-2 hover:bg-zinc-200 dark:hover:bg-dark-800 rounded-full transition active:scale-90">
-        <i class="fa-solid fa-chevron-right"></i>
+      <div class="flex items-center space-x-2">
+        <span id="viewingDateLabel" class="text-zinc-800 dark:text-volt-400 font-bold text-xs">PARTIDO DE HOY</span>
+        <button onclick="openRoutineModal()" class="text-[10px] bg-volt-400/15 text-volt-400 border border-volt-400/30 px-2 py-0.5 rounded font-bold hover:bg-volt-400 hover:text-pitch-950 transition" title="Añadir o editar misiones">
+          + Misión
+        </button>
+      </div>
+      <button onclick="changeDay(1)" class="w-7 h-7 flex items-center justify-center bg-white dark:bg-pitch-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-volt-500 active:scale-90 transition">
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
       </button>
     </div>
 
-    <!-- Contenido Principal -->
+    <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
       
-      <!-- 1. VISTA: HOY -->
-      <section id="viewDaily" class="space-y-6">
+      <!-- 1. VISTA: HOY (MISIONES DIARIAS) -->
+      <section id="viewDaily" class="space-y-5">
         <div>
-          <div class="flex items-center space-x-2 text-gold-500 font-bold text-xs uppercase tracking-wider mb-2.5 px-1">
-            <span>🌅</span>
-            <h2>Mañana</h2>
-            <span id="badge-morning" class="text-[11px] bg-gold-400/10 text-gold-500 dark:text-gold-400 border border-gold-500/20 px-2 py-0.5 rounded-full font-bold ml-auto">0/0</span>
+          <div class="flex items-center space-x-2 text-volt-500 dark:text-volt-400 font-hud font-bold text-xs uppercase tracking-widest mb-2 px-1">
+            <i class="fa-solid fa-sun text-amber-400"></i>
+            <h2>1ª Parte • Mañana</h2>
+            <span id="badge-morning" class="text-[10px] bg-volt-400/15 text-volt-500 dark:text-volt-400 border border-volt-400/30 px-2 py-0.5 rounded-md font-bold ml-auto">0/0</span>
           </div>
           <div id="list-morning" class="space-y-2"></div>
         </div>
 
         <div>
-          <div class="flex items-center space-x-2 text-gold-500 font-bold text-xs uppercase tracking-wider mb-2.5 px-1">
-            <span>☀️</span>
-            <h2>Tarde</h2>
-            <span id="badge-afternoon" class="text-[11px] bg-gold-400/10 text-gold-500 dark:text-gold-400 border border-gold-500/20 px-2 py-0.5 rounded-full font-bold ml-auto">0/0</span>
+          <div class="flex items-center space-x-2 text-volt-500 dark:text-volt-400 font-hud font-bold text-xs uppercase tracking-widest mb-2 px-1">
+            <i class="fa-solid fa-bolt text-volt-400"></i>
+            <h2>2ª Parte • Tarde</h2>
+            <span id="badge-afternoon" class="text-[10px] bg-volt-400/15 text-volt-500 dark:text-volt-400 border border-volt-400/30 px-2 py-0.5 rounded-md font-bold ml-auto">0/0</span>
           </div>
           <div id="list-afternoon" class="space-y-2"></div>
         </div>
 
         <div>
-          <div class="flex items-center space-x-2 text-gold-500 font-bold text-xs uppercase tracking-wider mb-2.5 px-1">
-            <span>🌙</span>
-            <h2>Noche</h2>
-            <span id="badge-night" class="text-[11px] bg-gold-400/10 text-gold-500 dark:text-gold-400 border border-gold-500/20 px-2 py-0.5 rounded-full font-bold ml-auto">0/0</span>
+          <div class="flex items-center space-x-2 text-volt-500 dark:text-volt-400 font-hud font-bold text-xs uppercase tracking-widest mb-2 px-1">
+            <i class="fa-solid fa-moon text-indigo-400"></i>
+            <h2>Tiempo Extra • Noche</h2>
+            <span id="badge-night" class="text-[10px] bg-volt-400/15 text-volt-500 dark:text-volt-400 border border-volt-400/30 px-2 py-0.5 rounded-md font-bold ml-auto">0/0</span>
           </div>
           <div id="list-night" class="space-y-2"></div>
         </div>
 
-        <div id="emptyDailyState" class="hidden text-center py-12 px-4">
-          <div class="w-14 h-14 bg-zinc-100 dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl text-gold-400">✨</div>
-          <p class="text-zinc-600 dark:text-zinc-400 font-medium text-xs">No tienes hábitos fijados todavía.</p>
-          <button onclick="switchTab('manage')" class="mt-2 text-gold-500 text-xs font-bold underline">Configurar hábitos fijos</button>
+        <!-- Botón de Acceso a Gestión de Plantilla -->
+        <div class="pt-2">
+          <button onclick="openManageModal()" class="w-full py-2.5 bg-zinc-200/70 dark:bg-pitch-850 hover:border-volt-400/50 border border-zinc-300 dark:border-zinc-800 rounded-xl text-xs font-hud uppercase font-bold text-zinc-600 dark:text-zinc-400 flex items-center justify-center space-x-2 transition">
+            <i class="fa-solid fa-sliders text-volt-400"></i>
+            <span>Configurar Pizarra de Hábitos Fijos</span>
+          </button>
         </div>
       </section>
 
-      <!-- 2. VISTA: GYM -->
+      <!-- 2. VISTA: GYM (ENTRENAMIENTO DE SUPERTÉCNICAS) -->
       <section id="viewGym" class="hidden space-y-4">
-        <!-- Selector de Día -->
-        <div class="flex space-x-2 p-1.5 bg-zinc-100 dark:bg-dark-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-          <button id="btnDayPecho" onclick="selectGymRoutine('pecho')" class="flex-1 py-2 text-xs font-black rounded-xl bg-gold-400 text-black shadow-md transition">
-            Pecho & Tríceps
+        <div class="flex space-x-2 p-1.5 bg-zinc-200/70 dark:bg-pitch-950 rounded-2xl border border-zinc-300 dark:border-zinc-800">
+          <button id="btnDayPecho" onclick="selectGymRoutine('pecho')" class="flex-1 py-2.5 text-xs font-hud font-bold uppercase tracking-wider rounded-xl bg-volt-400 text-pitch-950 shadow-md volt-glow transition">
+            ⚡ Pecho & Tríceps
           </button>
-          <button id="btnDayEspalda" onclick="selectGymRoutine('espalda')" class="flex-1 py-2 text-xs font-bold rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white transition">
-            Espalda, Brazo & Hombro
+          <button id="btnDayEspalda" onclick="selectGymRoutine('espalda')" class="flex-1 py-2.5 text-xs font-hud font-bold uppercase tracking-wider rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-white transition">
+            🛡️ Espalda, Brazo & Hombro
           </button>
         </div>
 
         <div class="flex justify-between items-center px-1">
-          <h2 id="gymRoutineTitle" class="text-sm font-black text-zinc-900 dark:text-white">Pecho & Tríceps</h2>
-          <span class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Cargas & Marcas</span>
+          <div>
+            <span class="text-[10px] font-hud uppercase text-volt-400 font-bold tracking-widest">Cámara de Entrenamiento</span>
+            <h2 id="gymRoutineTitle" class="text-sm font-hud font-bold uppercase text-zinc-900 dark:text-white">Pecho & Tríceps</h2>
+          </div>
+          <span class="text-[10px] font-hud bg-volt-400/15 text-volt-400 border border-volt-400/30 px-2.5 py-1 rounded-lg font-bold">+25 EXP / serie</span>
         </div>
 
         <div id="gymExerciseList" class="space-y-3"></div>
       </section>
 
-      <!-- 3. VISTA: PESO CORPORAL -->
-      <section id="viewBodyweight" class="hidden space-y-4">
-        <div class="p-5 bg-gradient-to-br from-zinc-900 to-dark-800 rounded-3xl border border-gold-500/30 text-white shadow-xl relative overflow-hidden">
-          <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-gold-500/5 rounded-full pointer-events-none"></div>
-          <span class="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Peso Corporal Actual</span>
-          <div class="flex items-baseline space-x-2 mt-1">
-            <h3 id="currentBodyweightDisplay" class="text-3xl font-black text-white">--</h3>
-            <span class="text-sm font-semibold text-zinc-400">kg</span>
+      <!-- 3. VISTA: EQUIPO POKÉMON & EVOLUCIONES -->
+      <section id="viewPartners" class="hidden space-y-4">
+        <!-- Banner Compañero Titular -->
+        <div class="p-5 bg-gradient-to-br from-pitch-950 via-pitch-900 to-pitch-850 rounded-3xl border-2 border-volt-400/50 text-white shadow-xl relative overflow-hidden flex items-center justify-between">
+          <div class="space-y-1 z-10 pr-2">
+            <span class="text-[10px] font-hud uppercase tracking-widest text-volt-400 font-bold block">⚡ Compañero Titular en Pista</span>
+            <h2 id="activePartnerCardName" class="text-2xl font-hud font-black uppercase text-white">Pikachu</h2>
+            <p id="activePartnerCardDesc" class="text-xs text-zinc-400 leading-relaxed">Velocidad eléctrica en banda. Aumenta tu motivación diaria.</p>
+            <div class="pt-2 flex items-center space-x-2">
+              <span id="activePartnerCardType" class="text-[10px] font-hud uppercase bg-volt-400 text-pitch-950 font-black px-2.5 py-0.5 rounded-md">Eléctrico</span>
+              <span id="activePartnerCardBonus" class="text-[10px] font-hud uppercase bg-pitch-800 text-volt-300 border border-volt-400/30 px-2.5 py-0.5 rounded-md font-bold">Espíritu Rayo</span>
+            </div>
           </div>
-          <p id="weightDiffDisplay" class="text-[11px] text-zinc-400 mt-1">Registra tu peso de hoy en ayunas</p>
+          <div class="w-24 h-24 rounded-2xl bg-pitch-950/80 border border-volt-400/30 flex items-center justify-center shrink-0 shadow-inner">
+            <img id="activePartnerCardSprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" class="w-20 h-20 object-contain pixelated animate-float" alt="Pokemon">
+          </div>
         </div>
 
-        <!-- Formulario registro de peso -->
-        <div class="p-4 bg-white dark:bg-dark-800 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 space-y-3 shadow-sm">
-          <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Nuevo Registro de Peso</h4>
+        <div class="flex justify-between items-center px-1">
+          <div>
+            <h3 class="text-xs font-hud font-bold uppercase text-zinc-800 dark:text-white tracking-wider">Poké-Convocatoria (Desbloqueables por Nivel)</h3>
+            <p class="text-[11px] text-zinc-400">Cumple hábitos y registra pesos en el Gym para subir de nivel.</p>
+          </div>
+        </div>
+
+        <!-- Cuadrícula de Compañeros Pokémon -->
+        <div id="pokemonGrid" class="grid grid-cols-2 gap-3"></div>
+      </section>
+
+      <!-- 4. VISTA: FÍSICO / PESO CORPORAL -->
+      <section id="viewBodyweight" class="hidden space-y-4">
+        <div class="p-5 bg-pitch-950 rounded-3xl border-2 border-volt-400/40 text-white shadow-xl relative overflow-hidden">
+          <div class="absolute right-3 top-3 text-volt-400/10 text-6xl pointer-events-none">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <span class="text-[10px] font-hud uppercase tracking-widest text-volt-400 font-bold">Biometría • Futsal Pro</span>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <h3 id="currentBodyweightDisplay" class="text-4xl font-hud font-black text-white">--</h3>
+            <span class="text-sm font-hud font-bold text-volt-400 uppercase">KG</span>
+          </div>
+          <p id="weightDiffDisplay" class="text-[11px] text-zinc-400 mt-1">Controla tu peso óptimo de competición (+20 EXP por registro)</p>
+        </div>
+
+        <div class="p-4 bg-white dark:bg-pitch-850 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-3 shadow-sm">
+          <h4 class="text-xs font-hud font-bold text-zinc-800 dark:text-volt-400 uppercase tracking-wider">Registrar Pesaje en Ayunas</h4>
           <div class="flex space-x-2">
-            <input type="number" id="inputNewWeight" step="0.1" placeholder="Ej: 75.5" class="flex-1 px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
-            <button onclick="logBodyweight()" class="px-5 py-2.5 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl shadow-md transition active:scale-95">
+            <input type="number" id="inputNewWeight" step="0.1" placeholder="Ej: 74.5" class="flex-1 px-3.5 py-2.5 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm font-hud font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-volt-400">
+            <button onclick="logBodyweight()" class="px-5 py-2.5 bg-volt-400 hover:bg-volt-500 text-pitch-950 text-xs font-hud font-bold uppercase tracking-wider rounded-xl shadow-md volt-glow transition active:scale-95">
               Guardar
             </button>
           </div>
         </div>
 
-        <!-- Historial de pesajes -->
         <div class="space-y-2">
-          <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider px-1">Histórico de pesajes</h4>
+          <h4 class="text-xs font-hud font-bold text-zinc-400 uppercase tracking-wider px-1">Historial de Pesajes</h4>
           <div id="bodyweightHistoryList" class="space-y-2"></div>
         </div>
       </section>
 
-      <!-- 4. VISTA: GESTIÓN DE PLANTILLAS -->
-      <section id="viewManage" class="hidden space-y-4">
-        <div class="flex justify-between items-center mb-1 px-1">
-          <div>
-            <h2 class="text-sm font-bold text-zinc-900 dark:text-white">Plantilla de Hábitos</h2>
-            <p class="text-xs text-zinc-400">Se reinician automáticamente cada día a medianoche.</p>
+      <!-- 5. VISTA: FICHA DE JUGADOR (RADAR CHART.JS & BACKUP) -->
+      <section id="viewStats" class="hidden space-y-4">
+        <!-- Gráfico de Radar Pentagonal (Estilo Inazuma Eleven / Pokémon) -->
+        <div class="bg-pitch-950 rounded-3xl p-4 border-2 border-volt-400/40 text-white shadow-xl">
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <span class="text-[10px] font-hud uppercase tracking-widest text-volt-400 font-bold">Hexágono de Rendimiento</span>
+              <h3 class="text-sm font-hud font-bold uppercase text-white">Parámetros de Jugador</h3>
+            </div>
+            <span class="text-xs font-hud font-black text-volt-400 bg-volt-400/10 px-2.5 py-1 rounded-lg border border-volt-400/30">
+              MEDIA: <span id="overallRating">60</span>
+            </span>
+          </div>
+          <div class="w-full h-56 flex items-center justify-center">
+            <canvas id="playerRadarChart"></canvas>
           </div>
         </div>
 
-        <button onclick="openRoutineModal()" class="w-full py-3 bg-gold-400 hover:bg-gold-500 text-black font-extrabold text-xs rounded-2xl shadow-lg shadow-gold-500/10 flex items-center justify-center space-x-2 active:scale-[0.98] transition">
-          <i class="fa-solid fa-plus text-xs"></i>
-          <span>Añadir Hábito Fijo</span>
-        </button>
-
-        <div id="manageRoutinesList" class="space-y-2.5 pt-1"></div>
-      </section>
-
-      <!-- 5. VISTA: DATOS & COPIAS DE SEGURIDAD -->
-      <section id="viewStats" class="hidden space-y-4">
-        <!-- Tarjeta de consistencia -->
-        <div class="bg-gradient-to-br from-zinc-900 to-dark-800 rounded-3xl p-5 border border-zinc-800 text-white shadow-xl">
-          <span class="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Consistencia Global</span>
-          <h3 class="text-3xl font-black mt-1 text-white" id="statWeeklyRate">0%</h3>
-          <p class="text-[11px] text-zinc-400 mt-1">Cumplimiento promedio en los últimos 7 días</p>
+        <!-- Tarjetas de Resumen -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-white dark:bg-pitch-850 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+            <span class="text-[10px] font-hud uppercase text-volt-500 dark:text-volt-400 font-bold">Efectividad (7d)</span>
+            <h3 class="text-2xl font-hud font-black mt-0.5 text-zinc-900 dark:text-white" id="statWeeklyRate">0%</h3>
+            <p class="text-[10px] text-zinc-400">Hábitos cumplidos</p>
+          </div>
+          <div class="bg-white dark:bg-pitch-850 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+            <span class="text-[10px] font-hud uppercase text-sky-400 font-bold">Series en Gym</span>
+            <h3 class="text-2xl font-hud font-black mt-0.5 text-zinc-900 dark:text-white" id="statTotalGymSets">0</h3>
+            <p class="text-[10px] text-zinc-400">Series históricas</p>
+          </div>
         </div>
 
-        <!-- Copias de seguridad (Exportar / Importar) -->
-        <div class="p-4 bg-white dark:bg-dark-800 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 space-y-3 shadow-sm">
-          <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-shield-halved text-gold-400"></i>
-            <span>Copia de Seguridad y Respaldo</span>
+        <!-- Guardado de Partida (JSON) -->
+        <div class="p-4 bg-white dark:bg-pitch-850 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-3 shadow-sm">
+          <h4 class="text-xs font-hud font-bold text-zinc-800 dark:text-volt-400 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-floppy-disk text-volt-400"></i>
+            <span>Guardado de Partida (Copia de Seguridad)</span>
           </h4>
-          <p class="text-[11px] text-zinc-400">Guarda una copia de tus registros en tu móvil o restáurala si cambias de terminal.</p>
+          <p class="text-[11px] text-zinc-400">Exporta tus datos en un archivo o cárgalos si cambias de teléfono.</p>
           
           <div class="grid grid-cols-2 gap-2 pt-1">
-            <button onclick="exportBackupData()" class="py-2.5 px-3 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1.5 active:scale-95">
-              <i class="fa-solid fa-download text-gold-400"></i>
-              <span>Exportar JSON</span>
+            <button onclick="exportBackupData()" class="py-2.5 px-3 bg-zinc-100 dark:bg-pitch-950 hover:border-volt-400 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-hud font-bold uppercase rounded-xl transition flex items-center justify-center space-x-1.5 active:scale-95">
+              <i class="fa-solid fa-download text-volt-400"></i>
+              <span>Exportar</span>
             </button>
 
-            <label class="py-2.5 px-3 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1.5 active:scale-95 cursor-pointer text-center">
-              <i class="fa-solid fa-upload text-gold-400"></i>
-              <span>Importar JSON</span>
+            <label class="py-2.5 px-3 bg-zinc-100 dark:bg-pitch-950 hover:border-volt-400 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-hud font-bold uppercase rounded-xl transition flex items-center justify-center space-x-1.5 active:scale-95 cursor-pointer text-center">
+              <i class="fa-solid fa-upload text-volt-400"></i>
+              <span>Importar</span>
               <input type="file" id="backupFileInput" accept=".json" class="hidden" onchange="importBackupData(event)">
             </label>
           </div>
         </div>
 
-        <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider px-1">Últimos 14 días</h4>
+        <h4 class="text-xs font-hud font-bold text-zinc-400 uppercase tracking-wider px-1">Registro de los últimos 14 días</h4>
         <div id="historyList" class="space-y-2"></div>
       </section>
 
     </main>
 
-    <!-- MODAL: Historial Completo de un Ejercicio -->
-    <div id="exerciseHistoryModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
-      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl animate-in fade-in">
-        <div class="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-700/60 pb-3">
+    <!-- MODAL: Gestión de Pizarra de Hábitos Fijos -->
+    <div id="manageModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99990] flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-pitch-850 border-2 border-volt-400/50 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
+        <div class="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3">
           <div>
-            <span class="text-[10px] uppercase font-bold text-gold-400 tracking-wider">Histórico Detallado</span>
-            <h3 id="historyModalExerciseName" class="font-black text-zinc-900 dark:text-white text-base">Ejercicio</h3>
+            <span class="text-[10px] font-hud uppercase font-bold text-volt-400 tracking-wider">Pizarra Táctica</span>
+            <h3 class="font-hud font-bold uppercase text-zinc-900 dark:text-white text-base">Hábitos Diarios Fijos</h3>
+          </div>
+          <button onclick="closeManageModal()" class="text-zinc-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <button onclick="openRoutineModal()" class="w-full py-2.5 bg-volt-400 hover:bg-volt-500 text-pitch-950 font-hud font-bold uppercase tracking-wider text-xs rounded-xl shadow volt-glow flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Añadir Nuevo Hábito</span>
+        </button>
+
+        <div id="manageRoutinesList" class="space-y-2 overflow-y-auto custom-scroll flex-1 pr-1"></div>
+
+        <button onclick="closeManageModal()" class="w-full py-2.5 bg-zinc-100 dark:bg-pitch-950 text-zinc-700 dark:text-zinc-300 text-xs font-hud font-bold uppercase rounded-xl">
+          Cerrar
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL: Historial Completo de Ejercicio -->
+    <div id="exerciseHistoryModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-pitch-850 border-2 border-volt-400/50 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-zinc-200 dark:border-zinc-800 pb-3">
+          <div>
+            <span class="text-[10px] font-hud uppercase font-bold text-volt-400 tracking-wider">Evolución de Cargas</span>
+            <h3 id="historyModalExerciseName" class="font-hud font-bold uppercase text-zinc-900 dark:text-white text-base">Ejercicio</h3>
           </div>
           <button onclick="closeExerciseHistoryModal()" class="text-zinc-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-lg"></i>
@@ -302,19 +464,19 @@
 
         <div id="exerciseHistoryDetailList" class="space-y-2 max-h-64 overflow-y-auto custom-scroll pr-1"></div>
 
-        <button onclick="closeExerciseHistoryModal()" class="w-full py-2.5 bg-zinc-100 dark:bg-dark-750 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl transition">
+        <button onclick="closeExerciseHistoryModal()" class="w-full py-2.5 bg-zinc-100 dark:bg-pitch-950 border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-hud font-bold uppercase rounded-xl transition">
           Cerrar
         </button>
       </div>
     </div>
 
-    <!-- MODAL GYM: Registrar Serie / Carga -->
+    <!-- MODAL GYM: Añadir Serie -->
     <div id="gymLogModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
-      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
+      <div class="bg-white dark:bg-pitch-850 border-2 border-volt-400/60 rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center">
           <div>
-            <span class="text-[10px] uppercase font-bold text-gold-400 tracking-wider">Añadir Serie</span>
-            <h3 id="gymModalExerciseName" class="font-bold text-zinc-900 dark:text-white text-base">Ejercicio</h3>
+            <span class="text-[10px] font-hud uppercase font-bold text-volt-400 tracking-wider">⚡ Registrar Serie (+25 EXP)</span>
+            <h3 id="gymModalExerciseName" class="font-hud font-bold uppercase text-zinc-900 dark:text-white text-base">Ejercicio</h3>
           </div>
           <button onclick="closeGymLogModal()" class="text-zinc-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-lg"></i>
@@ -325,27 +487,27 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-zinc-400 mb-1">Peso (kg)</label>
-            <input type="number" step="0.5" id="gymModalWeight" placeholder="0" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-base font-black text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
+            <label class="block text-[11px] font-hud uppercase font-bold text-zinc-400 mb-1">Peso (kg)</label>
+            <input type="number" step="0.5" id="gymModalWeight" placeholder="0" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-700 rounded-xl text-base font-hud font-black text-zinc-800 dark:text-volt-400 focus:outline-none focus:border-volt-400">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-zinc-400 mb-1">Reps</label>
-            <input type="number" id="gymModalReps" placeholder="10" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-base font-black text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
+            <label class="block text-[11px] font-hud uppercase font-bold text-zinc-400 mb-1">Repeticiones</label>
+            <input type="number" id="gymModalReps" placeholder="10" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-700 rounded-xl text-base font-hud font-black text-zinc-800 dark:text-white focus:outline-none focus:border-volt-400">
           </div>
         </div>
 
         <div class="flex space-x-2 pt-2">
-          <button onclick="closeGymLogModal()" class="flex-1 py-3 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl transition">Cancelar</button>
-          <button onclick="saveGymSet()" class="flex-1 py-3 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl transition shadow-md shadow-gold-500/10">Guardar</button>
+          <button onclick="closeGymLogModal()" class="flex-1 py-3 bg-zinc-100 dark:bg-pitch-950 text-zinc-700 dark:text-zinc-300 text-xs font-hud font-bold uppercase rounded-xl transition">Cancelar</button>
+          <button onclick="saveGymSet()" class="flex-1 py-3 bg-volt-400 hover:bg-volt-500 text-pitch-950 text-xs font-hud font-bold uppercase rounded-xl transition shadow-md volt-glow">¡Anotar!</button>
         </div>
       </div>
     </div>
 
     <!-- MODAL HÁBITOS: Crear / Editar -->
     <div id="routineModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
-      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
+      <div class="bg-white dark:bg-pitch-850 border-2 border-volt-400/60 rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center">
-          <h3 id="modalTitle" class="font-bold text-zinc-900 dark:text-white text-base">Añadir Hábito</h3>
+          <h3 id="modalTitle" class="font-hud font-bold uppercase text-zinc-900 dark:text-white text-base">Nueva Misión</h3>
           <button onclick="closeRoutineModal()" class="text-zinc-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
@@ -354,54 +516,53 @@
         <input type="hidden" id="editRoutineId" value="">
 
         <div>
-          <label class="block text-xs font-semibold text-zinc-400 mb-1">Nombre</label>
-          <input type="text" id="routineNameInput" placeholder="Ej: Beber 500ml agua" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
+          <label class="block text-[11px] font-hud uppercase font-bold text-zinc-400 mb-1">Misión / Hábito</label>
+          <input type="text" id="routineNameInput" placeholder="Ej: Hidratación 500ml" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-volt-400">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-zinc-400 mb-1">Emoji</label>
-            <input type="text" id="routineEmojiInput" value="⭐" maxlength="2" class="w-full px-3 py-2 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-center text-base focus:outline-none focus:border-gold-400">
+            <label class="block text-[11px] font-hud uppercase font-bold text-zinc-400 mb-1">Icono</label>
+            <input type="text" id="routineEmojiInput" value="⚡" maxlength="2" class="w-full px-3 py-2 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-700 rounded-xl text-center text-base focus:outline-none focus:border-volt-400">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-zinc-400 mb-1">Franja</label>
-            <select id="routineTimeSlotInput" class="w-full px-3 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
+            <label class="block text-[11px] font-hud uppercase font-bold text-zinc-400 mb-1">Franja</label>
+            <select id="routineTimeSlotInput" class="w-full px-3 py-2.5 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-volt-400">
               <option value="morning">🌅 Mañana</option>
-              <option value="afternoon">☀️ Tarde</option>
+              <option value="afternoon">⚡ Tarde</option>
               <option value="night">🌙 Noche</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-zinc-400 mb-1">Categoría</label>
-          <select id="routineCategoryInput" class="w-full px-3 py-2 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
-            <option value="Salud">Salud & Bienestar</option>
-            <option value="Gimnasio">Gimnasio & Físico</option>
-            <option value="Productividad">Productividad</option>
-            <option value="Mentalidad">Mentalidad</option>
-            <option value="Personal">Personal</option>
+          <label class="block text-[11px] font-hud uppercase font-bold text-zinc-400 mb-1">Atributo que mejora</label>
+          <select id="routineCategoryInput" class="w-full px-3 py-2 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-volt-400">
+            <option value="Físico & Salud">⚡ Agilidad & Salud</option>
+            <option value="Fútbol Sala & Gym">⚽ Potencia & Futsal</option>
+            <option value="Táctica & Estudio">🧠 Técnica & Mentalidad</option>
+            <option value="Disciplina">🛡️ Disciplina Diaria</option>
           </select>
         </div>
 
         <div class="flex space-x-2 pt-2">
-          <button onclick="closeRoutineModal()" class="flex-1 py-3 bg-zinc-100 dark:bg-dark-750 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl transition">Cancelar</button>
-          <button onclick="saveRoutine()" class="flex-1 py-3 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl transition shadow-md shadow-gold-500/10">Guardar</button>
+          <button onclick="closeRoutineModal()" class="flex-1 py-3 bg-zinc-100 dark:bg-pitch-950 text-zinc-700 dark:text-zinc-300 text-xs font-hud font-bold uppercase rounded-xl transition">Cancelar</button>
+          <button onclick="saveRoutine()" class="flex-1 py-3 bg-volt-400 hover:bg-volt-500 text-pitch-950 text-xs font-hud font-bold uppercase rounded-xl transition shadow-md volt-glow">Guardar</button>
         </div>
       </div>
     </div>
 
     <!-- MODAL BORRAR -->
     <div id="deleteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
-      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-xs p-5 text-center space-y-3 shadow-2xl">
+      <div class="bg-white dark:bg-pitch-850 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-xs p-5 text-center space-y-3 shadow-2xl">
         <div class="w-12 h-12 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto text-xl border border-rose-500/20">
           <i class="fa-solid fa-trash-can"></i>
         </div>
-        <h4 class="font-black text-zinc-900 dark:text-white text-sm">¿Eliminar este hábito?</h4>
-        <p class="text-xs text-zinc-400">No volverá a aparecer en los siguientes días.</p>
+        <h4 class="font-hud font-bold uppercase text-zinc-900 dark:text-white text-sm">¿Eliminar hábito fijo?</h4>
+        <p class="text-xs text-zinc-400">Dejará de convocarse en tus próximos días.</p>
         <div class="flex space-x-2 pt-1">
-          <button onclick="closeDeleteModal()" class="flex-1 py-2 bg-zinc-100 dark:bg-dark-750 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl">Cancelar</button>
-          <button id="btnConfirmDelete" class="flex-1 py-2 bg-rose-500 text-white text-xs font-bold rounded-xl shadow-md">Eliminar</button>
+          <button onclick="closeDeleteModal()" class="flex-1 py-2.5 bg-zinc-100 dark:bg-pitch-950 text-zinc-700 dark:text-zinc-300 text-xs font-hud font-bold uppercase rounded-xl">Cancelar</button>
+          <button id="btnConfirmDelete" class="flex-1 py-2.5 bg-rose-500 text-white text-xs font-hud font-bold uppercase rounded-xl shadow-md">Eliminar</button>
         </div>
       </div>
     </div>
@@ -415,33 +576,148 @@
       });
     }
 
-    // Limpieza constante de cualquier inyección flotante residual
+    // Limpieza constante de banners residuales de Netlify
     setInterval(() => {
       document.querySelectorAll('iframe#netlify-drawer, [data-netlify-deploy-preview], [data-netlify-badge], a[href*="netlify.com"]').forEach(el => el.remove());
     }, 500);
 
-    // Sistema de Audio Sintético Nativo (Web Audio API)
+    // Base de Datos de Compañeros Pokémon (Con Sprites Oficiales Animados Gen 5 + Oficiales)
+    const POKEMON_PARTNERS = [
+      {
+        id: 'pichu',
+        name: 'Pichu',
+        reqLevel: 1,
+        type: 'Eléctrico',
+        bonus: 'Chispa Inicial',
+        desc: 'Compañero de cantera. Pequeño pero lleno de energía eléctrica.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/172.gif'
+      },
+      {
+        id: 'pikachu',
+        name: 'Pikachu',
+        reqLevel: 2,
+        type: 'Eléctrico',
+        bonus: 'Rayo Raimon',
+        desc: 'Velocidad pura en pista. Nunca se rinde en ningún partido.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif'
+      },
+      {
+        id: 'riolu',
+        name: 'Riolu',
+        reqLevel: 4,
+        type: 'Lucha',
+        bonus: 'Espíritu Constante',
+        desc: 'Entrena sin descanso en el gimnasio para superar sus límites.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/447.gif'
+      },
+      {
+        id: 'electabuzz',
+        name: 'Electabuzz',
+        reqLevel: 6,
+        type: 'Eléctrico',
+        bonus: 'Puño Trueno',
+        desc: 'Fuerza explosiva en tren superior. Domina los días de Pecho y Espalda.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/125.gif'
+      },
+      {
+        id: 'lucario',
+        name: 'Lucario',
+        reqLevel: 8,
+        type: 'Lucha / Acero',
+        bonus: 'Esferaier / Aura',
+        desc: 'Control mental y físico absoluto. Precisión letal en fútbol sala.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/448.gif'
+      },
+      {
+        id: 'charizard',
+        name: 'Charizard',
+        reqLevel: 10,
+        type: 'Fuego / Volador',
+        bonus: 'Tornado de Fuego',
+        desc: 'Potencia devastadora digna de Axel Blaze. Impone respeto total.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/6.gif'
+      },
+      {
+        id: 'jolteon',
+        name: 'Jolteon',
+        reqLevel: 12,
+        type: 'Eléctrico',
+        bonus: 'Regate Relámpago',
+        desc: 'Agilidad extrema para romper defensas en un contraataque.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/135.gif'
+      },
+      {
+        id: 'infernape',
+        name: 'Infernape',
+        reqLevel: 15,
+        type: 'Fuego / Lucha',
+        bonus: 'Ultrapuño',
+        desc: 'Maestro de las artes marciales y la resistencia física inagotable.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/392.gif'
+      },
+      {
+        id: 'raikou',
+        name: 'Raikou',
+        reqLevel: 18,
+        type: 'Eléctrico Legendario',
+        bonus: 'Emperador del Trueno',
+        desc: 'Bestia legendaria del relámpago. Tu disciplina es inquebrantable.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/243.gif'
+      },
+      {
+        id: 'rayquaza',
+        name: 'Rayquaza Shiny',
+        reqLevel: 22,
+        type: 'Dragón Legendario',
+        bonus: 'Ascenso Draco',
+        desc: 'La cumbre del entrenamiento. Color negro azabache y oro imperial.',
+        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/shiny/384.gif'
+      }
+    ];
+
+    // Sintetizador de Sonido Consola Portátil (Web Audio API)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep(freq = 587.33, type = 'sine', duration = 0.12) {
-      try {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-        if ('vibrate' in navigator) navigator.vibrate(20);
-      } catch (e) {}
+    function playTone(freq, type = 'square', duration = 0.09, delay = 0) {
+      setTimeout(() => {
+        try {
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {}
+      }, delay);
     }
 
-    function playSuccessChime() {
-      playBeep(523.25, 'sine', 0.08);
-      setTimeout(() => playBeep(659.25, 'sine', 0.12), 70);
+    function playCheckSound() {
+      playTone(587.33, 'triangle', 0.08, 0);
+      playTone(880, 'triangle', 0.14, 70);
+      if ('vibrate' in navigator) navigator.vibrate(20);
+    }
+
+    function playLevelUpSound() {
+      playTone(523.25, 'square', 0.08, 0);
+      playTone(659.25, 'square', 0.08, 80);
+      playTone(783.99, 'square', 0.08, 160);
+      playTone(1046.50, 'square', 0.22, 240);
+      if ('vibrate' in navigator) navigator.vibrate([30, 50, 60]);
+    }
+
+    function triggerVictoryConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 55,
+          spread: 60,
+          origin: { y: 0.7 },
+          colors: ['#facc15', '#eab308', '#ffffff', '#38bdf8']
+        });
+      }
     }
 
     // Modo Oscuro / Claro
@@ -467,38 +743,39 @@
         localStorage.setItem('theme_preference', 'dark');
         document.getElementById('themeIcon').className = 'fa-solid fa-moon';
       }
-      playBeep(440, 'triangle', 0.06);
+      playTone(440, 'sine', 0.05);
     }
 
-    // Datos maestros
+    // Datos iniciales
     const DEFAULT_MASTER_ROUTINES = [
-      { id: '1', title: 'Beber 500ml de agua', emoji: '💧', slot: 'morning', category: 'Salud' },
-      { id: '2', title: '10 min de lectura / meditación', emoji: '🧘', slot: 'morning', category: 'Mentalidad' },
-      { id: '3', title: 'Planificar el día', emoji: '📋', slot: 'morning', category: 'Productividad' },
-      { id: '4', title: 'Entrenamiento en Gym', emoji: '🏋️', slot: 'afternoon', category: 'Gimnasio' },
-      { id: '5', title: 'Desconectar pantallas 30 min antes', emoji: '🌙', slot: 'night', category: 'Salud' }
+      { id: '1', title: 'Hidratación inicial (500ml agua)', emoji: '💧', slot: 'morning', category: 'Físico & Salud' },
+      { id: '2', title: 'Movilidad / Estiramientos (10 min)', emoji: '⚡', slot: 'morning', category: 'Fútbol Sala & Gym' },
+      { id: '3', title: 'Planificar objetivos tácticos del día', emoji: '📋', slot: 'morning', category: 'Táctica & Estudio' },
+      { id: '4', title: 'Entrenamiento de Fuerza / Pista', emoji: '⚽', slot: 'afternoon', category: 'Fútbol Sala & Gym' },
+      { id: '5', title: 'Cumplir tareas clave pendientes', emoji: '🏆', slot: 'afternoon', category: 'Disciplina' },
+      { id: '6', title: 'Lectura / Desconexión sin pantallas', emoji: '🌙', slot: 'night', category: 'Táctica & Estudio' }
     ];
 
     const GYM_ROUTINES = {
       pecho: {
         title: "Día de Pecho & Tríceps",
         exercises: [
-          { id: "aperturas", name: "Aperturas", icon: "👐" },
-          { id: "pecho_bajo", name: "Pecho Bajo", icon: "📉" },
-          { id: "pecho_superior", name: "Pecho Superior", icon: "📈" },
-          { id: "triceps", name: "Tríceps", icon: "💪" },
-          { id: "abdominales_pecho", name: "Abdominales", icon: "🍫" }
+          { id: "aperturas", name: "Aperturas", icon: "⚡", tag: "Pectoral" },
+          { id: "pecho_bajo", name: "Pecho Bajo", icon: "🔥", tag: "Potencia Inferior" },
+          { id: "pecho_superior", name: "Pecho Superior", icon: "☄️", tag: "Clavicular" },
+          { id: "triceps", name: "Tríceps", icon: "💪", tag: "Extensión" },
+          { id: "abdominales_pecho", name: "Abdominales", icon: "🛡️", tag: "Core Futsal" }
         ]
       },
       espalda: {
         title: "Día de Espalda, Brazo & Hombro",
         exercises: [
-          { id: "remo_t", name: "Remo T", icon: "🚣" },
-          { id: "jalon", name: "Jalón", icon: "🧗" },
-          { id: "curl_martillo", name: "Curl Martillo", icon: "🔨" },
-          { id: "biceps", name: "Bíceps", icon: "💪" },
-          { id: "elevacion_hombro", name: "Elevación Hombro", icon: "🦅" },
-          { id: "abdominales_espalda", name: "Abdominales", icon: "🍫" }
+          { id: "remo_t", name: "Remo T", icon: "🦅", tag: "Densidad Dorsal" },
+          { id: "jalon", name: "Jalón", icon: "⚡", tag: "Amplitud" },
+          { id: "curl_martillo", name: "Curl Martillo", icon: "🔨", tag: "Braquial" },
+          { id: "biceps", name: "Bíceps", icon: "💪", tag: "Pico Bíceps" },
+          { id: "elevacion_hombro", name: "Elevación Hombro", icon: "🌟", tag: "Deltoides" },
+          { id: "abdominales_espalda", name: "Abdominales", icon: "🛡️", tag: "Core Futsal" }
         ]
       }
     };
@@ -507,9 +784,11 @@
     let daysRecord = JSON.parse(localStorage.getItem('days_record')) || {};
     let gymRecords = JSON.parse(localStorage.getItem('gym_records')) || {};
     let bodyweightRecords = JSON.parse(localStorage.getItem('bodyweight_records')) || [];
+    let selectedPartnerId = localStorage.getItem('selected_pokemon_partner') || 'pichu';
     let activeDate = getTodayKey();
     let currentGymDay = 'pecho';
     let pendingDeleteId = null;
+    let radarChartInstance = null;
 
     function getTodayKey() {
       const d = new Date();
@@ -528,12 +807,119 @@
     function saveGymRecords() { localStorage.setItem('gym_records', JSON.stringify(gymRecords)); }
     function saveBodyweightRecords() { localStorage.setItem('bodyweight_records', JSON.stringify(bodyweightRecords)); }
 
+    function getPlayerLevelAndXp() {
+      let totalCompletedTasks = 0;
+      Object.values(daysRecord).forEach(day => {
+        totalCompletedTasks += Object.keys(day.completedIds || {}).length;
+      });
+      let totalGymSets = 0;
+      Object.values(gymRecords).forEach(arr => {
+        totalGymSets += arr.length;
+      });
+      const totalXp = (totalCompletedTasks * 15) + (totalGymSets * 25) + (bodyweightRecords.length * 20);
+      const level = Math.floor(totalXp / 100) + 1;
+      const xpInCurrentLevel = totalXp % 100;
+      return { level, totalXp, xpInCurrentLevel, totalGymSets, totalCompletedTasks };
+    }
+
+    function updatePlayerRPGStats() {
+      const { level, totalXp, xpInCurrentLevel, totalGymSets } = getPlayerLevelAndXp();
+
+      const ranks = [
+        { min: 1, title: "⚡ Canterano Raimon" },
+        { min: 3, title: "⚽ Titular Indiscutible" },
+        { min: 6, title: "🔥 Capitán de Pista" },
+        { min: 10, title: "🌟 Super Once" },
+        { min: 15, title: "👑 Campeón Mundial" }
+      ];
+
+      let currentRank = ranks[0].title;
+      ranks.forEach(r => { if (level >= r.min) currentRank = r.title; });
+
+      document.getElementById('playerLevel').innerText = level;
+      document.getElementById('playerRankBadge').innerText = currentRank;
+      document.getElementById('totalXpDisplay').innerText = totalXp;
+      document.getElementById('xpBar').style.width = `${xpInCurrentLevel}%`;
+      document.getElementById('nextLevelXp').innerText = `${xpInCurrentLevel}/100`;
+
+      const statGymEl = document.getElementById('statTotalGymSets');
+      if (statGymEl) statGymEl.innerText = totalGymSets;
+
+      // Actualizar Compañero Pokémon en cabecera
+      let partnerObj = POKEMON_PARTNERS.find(p => p.id === selectedPartnerId);
+      if (!partnerObj || partnerObj.reqLevel > level) {
+        // Si no tiene el nivel, asigna el más alto desbloqueado
+        const unlocked = POKEMON_PARTNERS.filter(p => p.reqLevel <= level);
+        partnerObj = unlocked[unlocked.length - 1] || POKEMON_PARTNERS[0];
+        selectedPartnerId = partnerObj.id;
+      }
+
+      document.getElementById('headerPartnerSprite').src = partnerObj.sprite;
+      document.getElementById('headerPartnerName').innerText = partnerObj.name;
+      document.getElementById('headerPartnerTitle').innerText = partnerObj.bonus;
+
+      // Actualizar tarjeta de vista Equipo
+      document.getElementById('activePartnerCardName').innerText = partnerObj.name;
+      document.getElementById('activePartnerCardDesc').innerText = partnerObj.desc;
+      document.getElementById('activePartnerCardType').innerText = partnerObj.type;
+      document.getElementById('activePartnerCardBonus').innerText = partnerObj.bonus;
+      document.getElementById('activePartnerCardSprite').src = partnerObj.sprite;
+    }
+
+    function renderPartnersView() {
+      const { level } = getPlayerLevelAndXp();
+      const grid = document.getElementById('pokemonGrid');
+      grid.innerHTML = '';
+
+      POKEMON_PARTNERS.forEach(poke => {
+        const isUnlocked = level >= poke.reqLevel;
+        const isSelected = poke.id === selectedPartnerId;
+
+        const card = document.createElement('div');
+        card.className = `p-3.5 rounded-2xl border-2 transition-all flex flex-col items-center text-center relative ${
+          isSelected
+            ? 'bg-volt-400/10 border-volt-400 volt-glow'
+            : isUnlocked
+              ? 'bg-white dark:bg-pitch-850 border-zinc-200 dark:border-zinc-800 hover:border-volt-400/50 cursor-pointer'
+              : 'bg-zinc-100/60 dark:bg-pitch-950/60 border-zinc-200/50 dark:border-zinc-800/50 opacity-60'
+        }`;
+
+        if (isUnlocked) {
+          card.onclick = () => selectPokemonPartner(poke.id);
+        }
+
+        card.innerHTML = `
+          <span class="absolute top-2 left-2 text-[9px] font-hud uppercase font-black px-1.5 py-0.5 rounded ${
+            isUnlocked ? 'bg-volt-400 text-pitch-950' : 'bg-zinc-700 text-zinc-300'
+          }">
+            NV. ${poke.reqLevel}
+          </span>
+          ${isSelected ? '<span class="absolute top-2 right-2 text-volt-400 text-xs"><i class="fa-solid fa-circle-check"></i></span>' : ''}
+          
+          <div class="w-16 h-16 flex items-center justify-center my-2">
+            <img src="${poke.sprite}" class="w-14 h-14 object-contain pixelated ${isUnlocked ? 'animate-float' : 'brightness-0 invert opacity-30'}" alt="${poke.name}">
+          </div>
+          
+          <h4 class="font-hud font-bold uppercase text-xs text-zinc-900 dark:text-white">${isUnlocked ? poke.name : '???'}</h4>
+          <span class="text-[9px] font-hud uppercase text-volt-500 dark:text-volt-400 font-bold mt-0.5">${isUnlocked ? poke.bonus : `Desbloqueo al NV.${poke.reqLevel}`}</span>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function selectPokemonPartner(id) {
+      selectedPartnerId = id;
+      localStorage.setItem('selected_pokemon_partner', id);
+      playCheckSound();
+      render();
+    }
+
     function changeDay(offset) {
       const parts = activeDate.split('-');
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
       d.setDate(d.getDate() + offset);
       activeDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-      playBeep(400, 'sine', 0.05);
+      playTone(420, 'sine', 0.04);
       render();
     }
 
@@ -543,12 +929,20 @@
       if (isDone) {
         delete daysRecord[activeDate].completedIds[id];
         delete daysRecord[activeDate].timestamps[id];
-        playBeep(330, 'sine', 0.08);
+        playTone(300, 'sine', 0.07);
       } else {
         daysRecord[activeDate].completedIds[id] = true;
         const now = new Date();
         daysRecord[activeDate].timestamps[id] = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-        playSuccessChime();
+        
+        // Comprobar si completó el 100% del día
+        const doneCount = Object.keys(daysRecord[activeDate].completedIds).length;
+        if (doneCount === masterRoutines.length && masterRoutines.length > 0) {
+          playLevelUpSound();
+          triggerVictoryConfetti();
+        } else {
+          playCheckSound();
+        }
       }
       saveRecords();
       render();
@@ -560,10 +954,10 @@
       
       const parts = activeDate.split('-');
       const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-      const dateFormatted = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
+      const dateFormatted = dateObj.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
 
-      document.getElementById('currentDateDisplay').innerText = activeDate === todayKey ? 'Hoy' : dateFormatted;
-      document.getElementById('viewingDateLabel').innerText = activeDate === todayKey ? `Hoy, ${dateFormatted}` : dateFormatted;
+      document.getElementById('currentDateDisplay').innerText = activeDate === todayKey ? '• Hoy' : `• ${dateFormatted}`;
+      document.getElementById('viewingDateLabel').innerText = activeDate === todayKey ? `PARTIDO DE HOY (${dateFormatted})` : `JORNADA: ${dateFormatted}`;
 
       const currentDayData = daysRecord[activeDate];
       const slots = ['morning', 'afternoon', 'night'];
@@ -586,32 +980,32 @@
           const time = currentDayData.timestamps[routine.id] || '';
 
           const item = document.createElement('div');
-          item.className = `flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+          item.className = `flex items-center justify-between p-3.5 rounded-2xl border-l-4 border transition-all ${
             isDone 
-              ? 'bg-gold-400/5 dark:bg-gold-400/10 border-gold-400/40 shadow-sm' 
-              : 'bg-white dark:bg-dark-800 border-zinc-200 dark:border-zinc-700/70 shadow-sm hover:border-gold-400/30'
+              ? 'bg-volt-400/10 border-volt-400 border-l-volt-400 shadow-sm' 
+              : 'bg-white dark:bg-pitch-850 border-zinc-200 dark:border-zinc-800 border-l-volt-400/50 hover:border-volt-400/60 shadow-sm'
           }`;
 
           item.innerHTML = `
             <div class="flex items-center space-x-3.5 flex-1 cursor-pointer" onclick="toggleCheck('${routine.id}')">
-              <button class="w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
+              <button class="w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${
                 isDone 
-                  ? 'bg-gold-400 border-gold-400 text-black shadow-sm' 
-                  : 'border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-dark-900'
+                  ? 'bg-volt-400 border-volt-400 text-pitch-950 volt-glow' 
+                  : 'border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-pitch-950'
               }">
-                ${isDone ? '<i class="fa-solid fa-check text-xs font-black"></i>' : ''}
+                ${isDone ? '<i class="fa-solid fa-bolt text-xs"></i>' : ''}
               </button>
               <div>
-                <p class="text-xs font-extrabold leading-tight ${isDone ? 'line-through text-zinc-400 dark:text-zinc-500' : 'text-zinc-800 dark:text-zinc-100'}">
+                <p class="text-xs font-bold leading-tight ${isDone ? 'line-through text-zinc-400 dark:text-zinc-500' : 'text-zinc-900 dark:text-zinc-100'}">
                   ${routine.emoji} ${routine.title}
                 </p>
-                <div class="flex items-center space-x-2 mt-0.5">
-                  <span class="text-[10px] text-zinc-400 font-semibold">${routine.category}</span>
-                  ${isDone ? `<span class="text-[10px] text-gold-500 font-bold">• ${time}</span>` : ''}
+                <div class="flex items-center space-x-2 mt-1">
+                  <span class="text-[9px] font-hud uppercase tracking-wider px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-pitch-950 text-zinc-500 dark:text-zinc-400 font-bold">${routine.category}</span>
+                  ${isDone ? `<span class="text-[10px] font-hud text-volt-500 dark:text-volt-400 font-bold">+15 EXP (${time})</span>` : ''}
                 </div>
               </div>
             </div>
-            <button onclick="openRoutineModal('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-gold-400 active:scale-90 transition">
+            <button onclick="openRoutineModal('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-volt-400 active:scale-90 transition">
               <i class="fa-solid fa-pen text-xs"></i>
             </button>
           `;
@@ -626,7 +1020,6 @@
       document.getElementById('progressBar').style.width = `${pct}%`;
       document.getElementById('progressText').innerText = `${pct}%`;
 
-      document.getElementById('emptyDailyState').classList.toggle('hidden', totalRoutines > 0);
       calculateStreak();
     }
 
@@ -635,10 +1028,10 @@
       currentGymDay = routineKey;
       const isPecho = routineKey === 'pecho';
       
-      document.getElementById('btnDayPecho').className = `flex-1 py-2 text-xs font-black rounded-xl transition ${isPecho ? 'bg-gold-400 text-black shadow-md' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white'}`;
-      document.getElementById('btnDayEspalda').className = `flex-1 py-2 text-xs font-black rounded-xl transition ${!isPecho ? 'bg-gold-400 text-black shadow-md' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white'}`;
+      document.getElementById('btnDayPecho').className = `flex-1 py-2.5 text-xs font-hud font-bold uppercase tracking-wider rounded-xl transition ${isPecho ? 'bg-volt-400 text-pitch-950 shadow-md volt-glow' : 'text-zinc-500 dark:text-zinc-400 hover:text-white'}`;
+      document.getElementById('btnDayEspalda').className = `flex-1 py-2.5 text-xs font-hud font-bold uppercase tracking-wider rounded-xl transition ${!isPecho ? 'bg-volt-400 text-pitch-950 shadow-md volt-glow' : 'text-zinc-500 dark:text-zinc-400 hover:text-white'}`;
       
-      playBeep(480, 'sine', 0.05);
+      playTone(500, 'triangle', 0.05);
       renderGymView();
     }
 
@@ -651,39 +1044,50 @@
       routine.exercises.forEach(ex => {
         const history = gymRecords[ex.id] || [];
         const lastEntry = history.length > 0 ? history[history.length - 1] : null;
+        
+        let maxWeight = 0;
+        history.forEach(h => { if (h.weight > maxWeight) maxWeight = h.weight; });
 
         const card = document.createElement('div');
-        card.className = 'bg-white dark:bg-dark-800 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 shadow-sm space-y-3';
+        card.className = 'bg-white dark:bg-pitch-850 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 border-l-4 border-l-volt-400 shadow-sm space-y-3';
         
         let historyMarkup = '';
         if (lastEntry) {
           historyMarkup = `
-            <div class="flex items-center justify-between text-xs bg-zinc-50 dark:bg-dark-900 p-2.5 rounded-xl border border-zinc-100 dark:border-zinc-750">
-              <span class="text-zinc-400 text-[11px]"><i class="fa-regular fa-clock mr-1 text-gold-400"></i>${lastEntry.date}</span>
-              <span class="font-black text-gold-400">${lastEntry.weight} kg <span class="text-zinc-400 font-normal">×</span> ${lastEntry.reps} reps</span>
+            <div class="flex items-center justify-between text-xs bg-zinc-50 dark:bg-pitch-950 p-2.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800">
+              <div class="flex items-center space-x-2">
+                <span class="text-zinc-400 text-[11px] font-hud"><i class="fa-regular fa-calendar mr-1 text-volt-400"></i>Último (${lastEntry.date}):</span>
+                <span class="font-hud font-black text-zinc-900 dark:text-white text-sm">${lastEntry.weight} KG <span class="text-volt-400">×</span> ${lastEntry.reps}</span>
+              </div>
+              <span class="text-[10px] font-hud uppercase bg-volt-400/15 text-volt-400 border border-volt-400/30 px-2 py-0.5 rounded font-bold">
+                🏆 PR: ${maxWeight}kg
+              </span>
             </div>
           `;
         } else {
           historyMarkup = `
-            <div class="text-[11px] text-zinc-400 italic bg-zinc-50 dark:bg-dark-900 p-2 rounded-xl text-center">
-              Sin registros guardados
+            <div class="text-[11px] font-hud uppercase tracking-wider text-zinc-400 bg-zinc-50 dark:bg-pitch-950 p-2 rounded-xl text-center border border-dashed border-zinc-200 dark:border-zinc-800">
+              Sin marcas registradas • ¡Estrena esta supertécnica!
             </div>
           `;
         }
 
         card.innerHTML = `
           <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2.5">
-              <span class="text-xl bg-zinc-100 dark:bg-dark-750 p-2 rounded-xl">${ex.icon}</span>
-              <h3 class="text-xs font-black text-zinc-900 dark:text-white">${ex.name}</h3>
+            <div class="flex items-center space-x-3">
+              <span class="w-10 h-10 flex items-center justify-center text-lg bg-pitch-950 text-volt-400 rounded-xl border border-volt-400/30 shadow-inner">${ex.icon}</span>
+              <div>
+                <span class="text-[9px] font-hud uppercase tracking-widest text-volt-500 dark:text-volt-400 font-bold block">${ex.tag}</span>
+                <h3 class="text-sm font-hud font-bold uppercase text-zinc-900 dark:text-white">${ex.name}</h3>
+              </div>
             </div>
             <div class="flex items-center space-x-1.5">
-              <button onclick="openExerciseHistoryModal('${ex.id}', '${ex.name}')" class="px-2.5 py-1.5 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 text-zinc-400 hover:text-gold-400 text-xs font-bold rounded-xl transition" title="Ver Historial Completo">
+              <button onclick="openExerciseHistoryModal('${ex.id}', '${ex.name}')" class="w-8 h-8 flex items-center justify-center bg-zinc-100 dark:bg-pitch-950 hover:border-volt-400 border border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:text-volt-400 text-xs rounded-xl transition" title="Ver Historial">
                 <i class="fa-solid fa-clock-rotate-left"></i>
               </button>
-              <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3 py-1.5 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl transition active:scale-95 flex items-center space-x-1 shadow-sm">
+              <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3 py-2 bg-volt-400 hover:bg-volt-500 text-pitch-950 text-xs font-hud font-bold uppercase tracking-wider rounded-xl transition active:scale-95 flex items-center space-x-1 shadow-sm volt-glow">
                 <i class="fa-solid fa-plus text-[10px]"></i>
-                <span>Añadir</span>
+                <span>Serie</span>
               </button>
             </div>
           </div>
@@ -718,6 +1122,10 @@
 
       if (!gymRecords[exerciseId]) gymRecords[exerciseId] = [];
 
+      // Verificar si es Récord Personal para lanzar confeti
+      let prevMax = 0;
+      gymRecords[exerciseId].forEach(h => { if (h.weight > prevMax) prevMax = h.weight; });
+
       const today = new Date();
       const dateStr = `${today.getDate()}/${today.getMonth() + 1}`;
 
@@ -729,9 +1137,12 @@
       });
 
       saveGymRecords();
-      playSuccessChime();
+      playLevelUpSound();
+      if (weight > prevMax && prevMax > 0) {
+        triggerVictoryConfetti();
+      }
       closeGymLogModal();
-      renderGymView();
+      render();
     }
 
     // Historial Detallado de Ejercicio
@@ -743,15 +1154,15 @@
       const history = gymRecords[exerciseId] || [];
 
       if (history.length === 0) {
-        historyList.innerHTML = '<p class="text-xs text-zinc-400 text-center py-6">No hay series registradas aún.</p>';
+        historyList.innerHTML = '<p class="text-xs text-zinc-400 text-center py-6 font-hud uppercase">Todavía no hay series anotadas.</p>';
       } else {
         [...history].reverse().forEach((entry) => {
           const row = document.createElement('div');
-          row.className = 'flex items-center justify-between p-3 bg-zinc-50 dark:bg-dark-900 border border-zinc-100 dark:border-zinc-750 rounded-xl text-xs';
+          row.className = 'flex items-center justify-between p-3 bg-zinc-50 dark:bg-pitch-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs';
           row.innerHTML = `
-            <div class="flex items-center space-x-2">
-              <span class="text-zinc-400 text-[10px] font-semibold">${entry.date}</span>
-              <span class="font-black text-gold-400">${entry.weight} kg × ${entry.reps} reps</span>
+            <div class="flex items-center space-x-3">
+              <span class="text-zinc-400 text-[10px] font-hud uppercase font-bold bg-zinc-200/60 dark:bg-pitch-850 px-2 py-0.5 rounded">${entry.date}</span>
+              <span class="font-hud font-black text-volt-500 dark:text-volt-400 text-sm">${entry.weight} KG × ${entry.reps} REPS</span>
             </div>
             <button onclick="deleteExerciseEntry('${exerciseId}', '${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1">
               <i class="fa-solid fa-trash text-xs"></i>
@@ -773,7 +1184,7 @@
         gymRecords[exerciseId] = gymRecords[exerciseId].filter(e => e.id !== entryId);
         saveGymRecords();
         openExerciseHistoryModal(exerciseId, document.getElementById('historyModalExerciseName').innerText);
-        renderGymView();
+        render();
       }
     }
 
@@ -794,14 +1205,14 @@
 
       saveBodyweightRecords();
       input.value = '';
-      playSuccessChime();
-      renderBodyweightView();
+      playCheckSound();
+      render();
     }
 
     function deleteBodyweightEntry(id) {
       bodyweightRecords = bodyweightRecords.filter(b => b.id !== id);
       saveBodyweightRecords();
-      renderBodyweightView();
+      render();
     }
 
     function renderBodyweightView() {
@@ -818,13 +1229,13 @@
           const prev = bodyweightRecords[1].weight;
           const diff = (latest - prev).toFixed(1);
           const sign = diff > 0 ? `+${diff}` : `${diff}`;
-          diffDisplay.innerText = `${sign} kg respecto al anterior (${bodyweightRecords[1].date})`;
+          diffDisplay.innerText = `Variación: ${sign} kg respecto al registro anterior (${bodyweightRecords[1].date})`;
         } else {
-          diffDisplay.innerText = `Primer registro completado`;
+          diffDisplay.innerText = `Peso inicial registrado en ficha`;
         }
       } else {
         currDisplay.innerText = '--';
-        diffDisplay.innerText = 'Registra tu peso de hoy en ayunas';
+        diffDisplay.innerText = 'Controla tu peso óptimo de competición (+20 EXP por registro)';
       }
 
       bodyweightRecords.forEach((entry, idx) => {
@@ -832,15 +1243,15 @@
         if (idx < bodyweightRecords.length - 1) {
           const nextOld = bodyweightRecords[idx + 1].weight;
           const d = (entry.weight - nextOld).toFixed(1);
-          comp = d >= 0 ? `<span class="text-gold-400 font-bold text-[10px]">+${d} kg</span>` : `<span class="text-emerald-400 font-bold text-[10px]">${d} kg</span>`;
+          comp = d >= 0 ? `<span class="text-volt-400 font-hud font-bold text-[11px]">+${d} kg</span>` : `<span class="text-emerald-400 font-hud font-bold text-[11px]">${d} kg</span>`;
         }
 
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-3 bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700/80 rounded-xl text-xs';
+        row.className = 'flex items-center justify-between p-3 bg-white dark:bg-pitch-850 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs';
         row.innerHTML = `
           <div class="flex items-center space-x-3">
-            <span class="text-zinc-400 font-semibold text-[11px]">${entry.date}</span>
-            <span class="font-black text-zinc-900 dark:text-white text-sm">${entry.weight} kg</span>
+            <span class="text-zinc-400 font-hud font-bold text-[11px]">${entry.date}</span>
+            <span class="font-hud font-black text-zinc-900 dark:text-white text-sm">${entry.weight} KG</span>
             ${comp}
           </div>
           <button onclick="deleteBodyweightEntry('${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1">
@@ -851,25 +1262,26 @@
       });
     }
 
-    // Copias de Seguridad (Exportar / Importar)
+    // Copias de Seguridad
     function exportBackupData() {
       const data = {
-        version: 1,
+        version: 3,
         exportDate: new Date().toISOString(),
         masterRoutines,
         daysRecord,
         gymRecords,
-        bodyweightRecords
+        bodyweightRecords,
+        selectedPartnerId
       };
 
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `rutinas_backup_${getTodayKey()}.json`;
+      a.download = `inazuma_poke_backup_${getTodayKey()}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      playSuccessChime();
+      playLevelUpSound();
     }
 
     function importBackupData(event) {
@@ -884,23 +1296,34 @@
           if (parsed.daysRecord) daysRecord = parsed.daysRecord;
           if (parsed.gymRecords) gymRecords = parsed.gymRecords;
           if (parsed.bodyweightRecords) bodyweightRecords = parsed.bodyweightRecords;
+          if (parsed.selectedPartnerId) selectedPartnerId = parsed.selectedPartnerId;
 
           saveMasters();
           saveRecords();
           saveGymRecords();
           saveBodyweightRecords();
+          localStorage.setItem('selected_pokemon_partner', selectedPartnerId);
 
-          playSuccessChime();
-          alert('¡Copia de seguridad restaurada con éxito!');
+          playLevelUpSound();
+          alert('¡Partida restaurada con éxito!');
           render();
         } catch (err) {
-          alert('Archivo de copia de seguridad no válido.');
+          alert('Archivo JSON inválido.');
         }
       };
       reader.readAsText(file);
     }
 
-    // Gestión de Hábitos
+    // Gestión de Hábitos Fijos
+    function openManageModal() {
+      renderManageView();
+      document.getElementById('manageModal').classList.remove('hidden');
+    }
+
+    function closeManageModal() {
+      document.getElementById('manageModal').classList.add('hidden');
+    }
+
     function renderManageView() {
       const list = document.getElementById('manageRoutinesList');
       list.innerHTML = '';
@@ -908,13 +1331,13 @@
       masterRoutines.forEach(routine => {
         const slotLabels = { morning: 'Mañana', afternoon: 'Tarde', night: 'Noche' };
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-3.5 bg-zinc-50 dark:bg-dark-800 rounded-2xl border border-zinc-200 dark:border-zinc-700/80';
+        row.className = 'flex items-center justify-between p-3 bg-zinc-50 dark:bg-pitch-950 rounded-xl border border-zinc-200 dark:border-zinc-800';
         row.innerHTML = `
-          <div class="flex items-center space-x-3">
-            <span class="text-xl bg-white dark:bg-dark-750 p-2 rounded-xl border border-zinc-200 dark:border-zinc-700">${routine.emoji}</span>
+          <div class="flex items-center space-x-2.5">
+            <span class="text-lg bg-white dark:bg-pitch-850 p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700">${routine.emoji}</span>
             <div>
               <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${routine.title}</p>
-              <div class="flex items-center space-x-2 text-[10px] text-zinc-400 font-medium">
+              <div class="flex items-center space-x-1.5 text-[9px] font-hud uppercase text-volt-500 dark:text-volt-400 font-bold">
                 <span>${slotLabels[routine.slot]}</span>
                 <span>•</span>
                 <span>${routine.category}</span>
@@ -922,10 +1345,10 @@
             </div>
           </div>
           <div class="flex items-center space-x-1">
-            <button onclick="openRoutineModal('${routine.id}')" class="p-2 text-zinc-400 hover:text-gold-400 active:scale-90 transition">
+            <button onclick="openRoutineModal('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-volt-400">
               <i class="fa-solid fa-pen text-xs"></i>
             </button>
-            <button onclick="promptDelete('${routine.id}')" class="p-2 text-zinc-400 hover:text-rose-500 active:scale-90 transition">
+            <button onclick="promptDelete('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-rose-500">
               <i class="fa-solid fa-trash text-xs"></i>
             </button>
           </div>
@@ -952,12 +1375,12 @@
         slotInput.value = r.slot;
         catInput.value = r.category;
       } else {
-        title.innerText = 'Nuevo Hábito Fijo';
+        title.innerText = 'Nueva Misión Fija';
         editId.value = '';
         nameInput.value = '';
-        emojiInput.value = '⭐';
+        emojiInput.value = '⚡';
         slotInput.value = 'morning';
-        catInput.value = 'Salud';
+        catInput.value = 'Físico & Salud';
       }
       modal.classList.remove('hidden');
     }
@@ -967,7 +1390,7 @@
     function saveRoutine() {
       const id = document.getElementById('editRoutineId').value;
       const title = document.getElementById('routineNameInput').value.trim();
-      const emoji = document.getElementById('routineEmojiInput').value.trim() || '⭐';
+      const emoji = document.getElementById('routineEmojiInput').value.trim() || '⚡';
       const slot = document.getElementById('routineTimeSlotInput').value;
       const category = document.getElementById('routineCategoryInput').value;
 
@@ -986,7 +1409,7 @@
       }
 
       saveMasters();
-      playSuccessChime();
+      playCheckSound();
       closeRoutineModal();
       render();
     }
@@ -1005,7 +1428,7 @@
       if (pendingDeleteId) {
         masterRoutines = masterRoutines.filter(r => r.id !== pendingDeleteId);
         saveMasters();
-        playBeep(260, 'sawtooth', 0.1);
+        playTone(240, 'sawtooth', 0.1);
         closeDeleteModal();
         render();
       }
@@ -1026,8 +1449,10 @@
         } else break;
       }
       document.getElementById('streakCount').innerText = streak;
+      return streak;
     }
 
+    // Renderizado de Radar Chart.js y Estadísticas
     function renderStats() {
       const historyEl = document.getElementById('historyList');
       historyEl.innerHTML = '';
@@ -1051,12 +1476,12 @@
 
         const dateTitle = i === 0 ? 'Hoy' : (i === 1 ? 'Ayer' : d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }));
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-3 bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700/80 rounded-xl text-xs';
+        row.className = 'flex items-center justify-between p-3 bg-white dark:bg-pitch-850 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs';
         row.innerHTML = `
-          <span class="font-bold text-zinc-700 dark:text-zinc-200 capitalize">${dateTitle}</span>
+          <span class="font-hud font-bold uppercase text-zinc-700 dark:text-zinc-200">${dateTitle}</span>
           <div class="flex items-center space-x-3">
-            <span class="text-zinc-400 font-medium">${done}/${total} hechos</span>
-            <span class="font-black ${pct >= 80 ? 'text-gold-400' : (pct >= 40 ? 'text-amber-500' : 'text-zinc-400')}">${pct}%</span>
+            <span class="text-zinc-400 text-[11px] font-hud">${done}/${total} misiones</span>
+            <span class="font-hud font-black text-sm ${pct >= 80 ? 'text-volt-400' : (pct >= 40 ? 'text-amber-500' : 'text-zinc-500')}">${pct}%</span>
           </div>
         `;
         historyEl.appendChild(row);
@@ -1064,35 +1489,88 @@
 
       const avg = countedDays > 0 ? Math.round(totalPct / countedDays) : 0;
       document.getElementById('statWeeklyRate').innerText = `${avg}%`;
+
+      // Calcular stats para el Hexágono Inazuma
+      const { totalGymSets, totalCompletedTasks, level } = getPlayerLevelAndXp();
+      const streak = calculateStreak();
+
+      const statPotencia = Math.min(99, 50 + (totalGymSets * 3));
+      const statDisciplina = Math.min(99, 45 + Math.round(avg * 0.5));
+      const statAgilidad = Math.min(99, 50 + (bodyweightRecords.length * 5));
+      const statMentalidad = Math.min(99, 50 + (totalCompletedTasks * 2));
+      const statResist = Math.min(99, 50 + (streak * 6) + (level * 2));
+
+      const media = Math.round((statPotencia + statDisciplina + statAgilidad + statMentalidad + statResist) / 5);
+      document.getElementById('overallRating').innerText = media;
+
+      const ctx = document.getElementById('playerRadarChart');
+      if (ctx && typeof Chart !== 'undefined') {
+        if (radarChartInstance) radarChartInstance.destroy();
+        radarChartInstance = new Chart(ctx, {
+          type: 'radar',
+          data: {
+            labels: ['POTENCIA', 'DISCIPLINA', 'AGILIDAD', 'TÁCTICA', 'ESPÍRITU'],
+            datasets: [{
+              label: 'Stats',
+              data: [statPotencia, statDisciplina, statAgilidad, statMentalidad, statResist],
+              backgroundColor: 'rgba(250, 204, 21, 0.25)',
+              borderColor: '#facc15',
+              pointBackgroundColor: '#facc15',
+              pointBorderColor: '#060609',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              r: {
+                min: 20,
+                max: 100,
+                ticks: { display: false, stepSize: 20 },
+                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                angleLines: { color: 'rgba(250, 204, 21, 0.2)' },
+                pointLabels: {
+                  color: '#facc15',
+                  font: { family: 'Chakra Petch', size: 10, weight: 'bold' }
+                }
+              }
+            },
+            plugins: { legend: { display: false } }
+          }
+        });
+      }
     }
 
     function switchTab(tab) {
       document.getElementById('viewDaily').classList.toggle('hidden', tab !== 'daily');
       document.getElementById('viewGym').classList.toggle('hidden', tab !== 'gym');
+      document.getElementById('viewPartners').classList.toggle('hidden', tab !== 'partners');
       document.getElementById('viewBodyweight').classList.toggle('hidden', tab !== 'bodyweight');
-      document.getElementById('viewManage').classList.toggle('hidden', tab !== 'manage');
       document.getElementById('viewStats').classList.toggle('hidden', tab !== 'stats');
       
       document.getElementById('dateSelectorBar').classList.toggle('hidden', tab !== 'daily');
       document.getElementById('dailyProgressContainer').classList.toggle('hidden', tab !== 'daily');
 
-      const tabs = ['daily', 'gym', 'bodyweight', 'manage', 'stats'];
+      const tabs = ['daily', 'gym', 'partners', 'bodyweight', 'stats'];
       tabs.forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
         if (t === tab) {
-          btn.className = 'flex-1 py-1.5 rounded-xl bg-gold-400 text-black shadow-md shadow-gold-500/20 font-black transition-all flex items-center justify-center space-x-1';
+          btn.className = 'flex-1 py-1.5 rounded-lg bg-volt-400 text-pitch-950 shadow-md volt-glow font-black transition-all flex items-center justify-center space-x-1';
         } else {
-          btn.className = 'flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all font-bold flex items-center justify-center space-x-1';
+          btn.className = 'flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-volt-300 transition-all font-bold flex items-center justify-center space-x-1';
         }
       });
 
-      playBeep(500, 'triangle', 0.04);
+      playTone(520, 'triangle', 0.04);
       render();
     }
 
     function render() {
+      updatePlayerRPGStats();
       renderDailyView();
       renderGymView();
+      renderPartnersView();
       renderBodyweightView();
       renderManageView();
       renderStats();
