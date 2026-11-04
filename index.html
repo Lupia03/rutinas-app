@@ -1,20 +1,43 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#4f46e5">
-  <title>Mi Rutina Diaria</title>
+  <meta name="theme-color" content="#09090b">
+  <title>Elite Routine & Gym Tracker</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gold: {
+              300: '#fde047',
+              400: '#facc15',
+              500: '#eab308',
+              600: '#ca8a04',
+            },
+            dark: {
+              900: '#09090b',
+              850: '#121215',
+              800: '#18181b',
+              750: '#202024',
+              700: '#27272a'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
-
-    /* Reglas agresivas para ocultar cualquier inyección de Netlify */
+    /* Ocultar cualquier inyección externa o banners residuales */
     iframe#netlify-drawer,
     [data-netlify-deploy-preview],
     [data-netlify-badge],
@@ -27,13 +50,10 @@
       opacity: 0 !important;
       pointer-events: none !important;
       transform: scale(0) !important;
-      width: 0 !important;
-      height: 0 !important;
       position: absolute !important;
       bottom: -9999px !important;
       z-index: -9999 !important;
     }
-
     .custom-scroll::-webkit-scrollbar {
       display: none;
     }
@@ -43,169 +63,260 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex justify-center selection:bg-indigo-500 selection:text-white">
+<body class="bg-zinc-100 dark:bg-dark-900 text-zinc-900 dark:text-zinc-100 antialiased min-h-screen flex justify-center transition-colors duration-300">
 
   <!-- Contenedor móvil -->
-  <div class="w-full max-w-md bg-white min-h-screen shadow-xl flex flex-col relative pb-32">
+  <div class="w-full max-w-md bg-white dark:bg-dark-850 min-h-screen shadow-2xl flex flex-col relative pb-16 border-x border-zinc-200 dark:border-zinc-800/80 transition-colors duration-300">
     
-    <!-- Cabecera fija -->
-    <header class="bg-indigo-600 text-white p-5 pt-8 rounded-b-3xl shadow-md sticky top-0 z-20">
+    <!-- Cabecera Premium -->
+    <header class="bg-gradient-to-b from-zinc-900 via-dark-850 to-dark-800 text-white p-5 pt-8 rounded-b-3xl shadow-xl border-b border-gold-500/20 sticky top-0 z-30">
       <div class="flex justify-between items-center mb-3">
         <div>
-          <span class="text-xs uppercase tracking-wider text-indigo-200 font-semibold">Hábitos & Entrenamiento</span>
-          <h1 id="currentDateDisplay" class="text-xl font-bold capitalize">Hoy</h1>
+          <span class="text-[10px] uppercase tracking-widest text-gold-400 font-extrabold flex items-center gap-1.5">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-gold-400 shadow-[0_0_8px_#facc15]"></span>
+            Elite Tracker
+          </span>
+          <h1 id="currentDateDisplay" class="text-xl font-black capitalize tracking-tight text-white mt-0.5">Hoy</h1>
         </div>
-        <div class="flex items-center space-x-2 bg-indigo-700/60 backdrop-blur px-3 py-1.5 rounded-full border border-indigo-400/30">
-          <span class="text-amber-400 text-sm">🔥</span>
-          <span id="streakCount" class="font-extrabold text-sm text-white">0</span>
-          <span class="text-xs text-indigo-200">días</span>
+        
+        <div class="flex items-center space-x-2">
+          <!-- Racha -->
+          <div class="flex items-center space-x-1.5 bg-dark-900/80 border border-gold-500/30 px-3 py-1.5 rounded-full shadow-inner">
+            <span class="text-gold-400 text-xs">⚡</span>
+            <span id="streakCount" class="font-black text-sm text-gold-400">0</span>
+            <span class="text-[10px] text-zinc-400 uppercase font-semibold">días</span>
+          </div>
+          <!-- Botón Modo Oscuro / Claro -->
+          <button onclick="toggleDarkMode()" class="w-8 h-8 rounded-full bg-dark-750 hover:bg-dark-700 border border-zinc-700/60 flex items-center justify-center text-gold-400 text-xs transition active:scale-90" title="Cambiar tema">
+            <i id="themeIcon" class="fa-solid fa-moon"></i>
+          </button>
         </div>
       </div>
 
-      <!-- Barra de Progreso Diario -->
-      <div id="dailyProgressContainer" class="mt-4 bg-indigo-900/40 p-3 rounded-2xl backdrop-blur-sm border border-indigo-500/30">
+      <!-- Barra de Progreso Diario de Hábitos -->
+      <div id="dailyProgressContainer" class="mt-3 bg-dark-900/60 p-3 rounded-2xl border border-zinc-800/90 shadow-sm">
         <div class="flex justify-between items-center text-xs mb-1.5 font-medium">
-          <span class="text-indigo-100">Progreso de hábitos</span>
-          <span id="progressText" class="font-bold text-white">0%</span>
+          <span class="text-zinc-400 text-[11px] font-semibold">Objetivos del día</span>
+          <span id="progressText" class="font-extrabold text-gold-400">0%</span>
         </div>
-        <div class="w-full bg-indigo-950/60 rounded-full h-2.5 overflow-hidden p-0.5">
-          <div id="progressBar" class="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+        <div class="w-full bg-dark-800 rounded-full h-2 overflow-hidden p-0.5 border border-zinc-700/50">
+          <div id="progressBar" class="bg-gradient-to-r from-yellow-500 via-gold-400 to-amber-300 h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(250,204,21,0.5)]" style="width: 0%"></div>
         </div>
       </div>
 
-      <!-- Barra de Navegación Superior -->
-      <div class="mt-4 bg-indigo-800/60 p-1 rounded-2xl flex justify-between items-center backdrop-blur-md border border-indigo-400/20 text-[11px]">
-        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-1.5 font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-calendar-check"></i>
+      <!-- Barra de Navegación Superior Estilo Cápsula -->
+      <div class="mt-4 bg-dark-900/90 p-1.5 rounded-2xl flex justify-between items-center border border-zinc-800 text-[11px] font-bold">
+        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-1.5 rounded-xl bg-gold-400 text-black shadow-md shadow-gold-500/20 transition-all flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-check"></i>
           <span>Hoy</span>
         </button>
 
-        <button onclick="switchTab('gym')" id="nav-gym" class="flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1">
+        <button onclick="switchTab('gym')" id="nav-gym" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
           <i class="fa-solid fa-dumbbell"></i>
           <span>Gym</span>
         </button>
 
-        <button onclick="switchTab('manage')" id="nav-manage" class="flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1">
+        <button onclick="switchTab('bodyweight')" id="nav-bodyweight" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-weight-scale"></i>
+          <span>Peso</span>
+        </button>
+
+        <button onclick="switchTab('manage')" id="nav-manage" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
           <i class="fa-solid fa-sliders"></i>
           <span>Rutinas</span>
         </button>
 
-        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-chart-simple"></i>
-          <span>Progreso</span>
+        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all flex items-center justify-center space-x-1">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Datos</span>
         </button>
       </div>
     </header>
 
     <!-- Selector de fecha (visible solo en Hoy) -->
-    <div id="dateSelectorBar" class="flex items-center justify-between px-6 py-3 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500">
-      <button onclick="changeDay(-1)" class="p-2 hover:bg-slate-200 rounded-full transition active:scale-90">
+    <div id="dateSelectorBar" class="flex items-center justify-between px-6 py-2.5 bg-zinc-50 dark:bg-dark-900 border-b border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+      <button onclick="changeDay(-1)" class="p-2 hover:bg-zinc-200 dark:hover:bg-dark-800 rounded-full transition active:scale-90">
         <i class="fa-solid fa-chevron-left"></i>
       </button>
-      <span id="viewingDateLabel" class="text-slate-700 font-bold tracking-wide">Día actual</span>
-      <button onclick="changeDay(1)" class="p-2 hover:bg-slate-200 rounded-full transition active:scale-90">
+      <span id="viewingDateLabel" class="text-zinc-800 dark:text-zinc-200 font-bold tracking-wide">Día actual</span>
+      <button onclick="changeDay(1)" class="p-2 hover:bg-zinc-200 dark:hover:bg-dark-800 rounded-full transition active:scale-90">
         <i class="fa-solid fa-chevron-right"></i>
       </button>
     </div>
 
     <!-- Contenido Principal -->
-    <main class="flex-1 p-4 overflow-y-auto custom-scroll">
+    <main class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
       
-      <!-- VISTA: HOY -->
+      <!-- 1. VISTA: HOY -->
       <section id="viewDaily" class="space-y-6">
         <div>
-          <div class="flex items-center space-x-2 text-amber-600 font-bold text-sm mb-2.5 px-1">
+          <div class="flex items-center space-x-2 text-gold-500 font-bold text-xs uppercase tracking-wider mb-2.5 px-1">
             <span>🌅</span>
             <h2>Mañana</h2>
-            <span id="badge-morning" class="text-[11px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium ml-auto">0/0</span>
+            <span id="badge-morning" class="text-[11px] bg-gold-400/10 text-gold-500 dark:text-gold-400 border border-gold-500/20 px-2 py-0.5 rounded-full font-bold ml-auto">0/0</span>
           </div>
           <div id="list-morning" class="space-y-2"></div>
         </div>
 
         <div>
-          <div class="flex items-center space-x-2 text-indigo-600 font-bold text-sm mb-2.5 px-1">
+          <div class="flex items-center space-x-2 text-gold-500 font-bold text-xs uppercase tracking-wider mb-2.5 px-1">
             <span>☀️</span>
             <h2>Tarde</h2>
-            <span id="badge-afternoon" class="text-[11px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full font-medium ml-auto">0/0</span>
+            <span id="badge-afternoon" class="text-[11px] bg-gold-400/10 text-gold-500 dark:text-gold-400 border border-gold-500/20 px-2 py-0.5 rounded-full font-bold ml-auto">0/0</span>
           </div>
           <div id="list-afternoon" class="space-y-2"></div>
         </div>
 
         <div>
-          <div class="flex items-center space-x-2 text-purple-600 font-bold text-sm mb-2.5 px-1">
+          <div class="flex items-center space-x-2 text-gold-500 font-bold text-xs uppercase tracking-wider mb-2.5 px-1">
             <span>🌙</span>
             <h2>Noche</h2>
-            <span id="badge-night" class="text-[11px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium ml-auto">0/0</span>
+            <span id="badge-night" class="text-[11px] bg-gold-400/10 text-gold-500 dark:text-gold-400 border border-gold-500/20 px-2 py-0.5 rounded-full font-bold ml-auto">0/0</span>
           </div>
           <div id="list-night" class="space-y-2"></div>
         </div>
 
         <div id="emptyDailyState" class="hidden text-center py-12 px-4">
-          <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl text-slate-400">📝</div>
-          <p class="text-slate-600 font-medium text-sm">No tienes rutinas añadidas todavía.</p>
-          <button onclick="switchTab('manage')" class="mt-3 text-indigo-600 text-xs font-bold underline">Configurar rutinas fijas</button>
+          <div class="w-14 h-14 bg-zinc-100 dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl text-gold-400">✨</div>
+          <p class="text-zinc-600 dark:text-zinc-400 font-medium text-xs">No tienes hábitos fijados todavía.</p>
+          <button onclick="switchTab('manage')" class="mt-2 text-gold-500 text-xs font-bold underline">Configurar hábitos fijos</button>
         </div>
       </section>
 
-      <!-- VISTA: GYM -->
+      <!-- 2. VISTA: GYM -->
       <section id="viewGym" class="hidden space-y-4">
-        <div class="flex space-x-2 p-1 bg-slate-100 rounded-2xl">
-          <button id="btnDayPecho" onclick="selectGymRoutine('pecho')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white shadow-sm text-indigo-600 transition">
+        <!-- Selector de Día -->
+        <div class="flex space-x-2 p-1.5 bg-zinc-100 dark:bg-dark-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+          <button id="btnDayPecho" onclick="selectGymRoutine('pecho')" class="flex-1 py-2 text-xs font-black rounded-xl bg-gold-400 text-black shadow-md transition">
             Pecho & Tríceps
           </button>
-          <button id="btnDayEspalda" onclick="selectGymRoutine('espalda')" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-800 transition">
+          <button id="btnDayEspalda" onclick="selectGymRoutine('espalda')" class="flex-1 py-2 text-xs font-bold rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white transition">
             Espalda, Brazo & Hombro
           </button>
         </div>
 
         <div class="flex justify-between items-center px-1">
-          <h2 id="gymRoutineTitle" class="text-sm font-extrabold text-slate-800">Pecho & Tríceps</h2>
-          <span class="text-[11px] text-slate-400 font-medium">Histórico de cargas</span>
+          <h2 id="gymRoutineTitle" class="text-sm font-black text-zinc-900 dark:text-white">Pecho & Tríceps</h2>
+          <span class="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">Cargas & Marcas</span>
         </div>
 
         <div id="gymExerciseList" class="space-y-3"></div>
       </section>
 
-      <!-- VISTA: GESTIÓN DE RUTINAS -->
-      <section id="viewManage" class="hidden space-y-4">
-        <div class="flex justify-between items-center mb-1 px-1">
-          <div>
-            <h2 class="text-base font-bold text-slate-800">Gestionar Plantilla</h2>
-            <p class="text-xs text-slate-400">Estas rutinas aparecerán todos los días de forma automática.</p>
+      <!-- 3. VISTA: PESO CORPORAL -->
+      <section id="viewBodyweight" class="hidden space-y-4">
+        <div class="p-5 bg-gradient-to-br from-zinc-900 to-dark-800 rounded-3xl border border-gold-500/30 text-white shadow-xl relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-gold-500/5 rounded-full pointer-events-none"></div>
+          <span class="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Peso Corporal Actual</span>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <h3 id="currentBodyweightDisplay" class="text-3xl font-black text-white">--</h3>
+            <span class="text-sm font-semibold text-zinc-400">kg</span>
+          </div>
+          <p id="weightDiffDisplay" class="text-[11px] text-zinc-400 mt-1">Registra tu peso de hoy en ayunas</p>
+        </div>
+
+        <!-- Formulario registro de peso -->
+        <div class="p-4 bg-white dark:bg-dark-800 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 space-y-3 shadow-sm">
+          <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">Nuevo Registro de Peso</h4>
+          <div class="flex space-x-2">
+            <input type="number" id="inputNewWeight" step="0.1" placeholder="Ej: 75.5" class="flex-1 px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
+            <button onclick="logBodyweight()" class="px-5 py-2.5 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl shadow-md transition active:scale-95">
+              Guardar
+            </button>
           </div>
         </div>
 
-        <button onclick="openRoutineModal()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-100 flex items-center justify-center space-x-2 active:scale-[0.98] transition">
-          <i class="fa-solid fa-plus text-sm"></i>
-          <span>Nueva Rutina Fija</span>
-        </button>
-
-        <div id="manageRoutinesList" class="space-y-2.5 pt-2"></div>
+        <!-- Historial de pesajes -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider px-1">Histórico de pesajes</h4>
+          <div id="bodyweightHistoryList" class="space-y-2"></div>
+        </div>
       </section>
 
-      <!-- VISTA: HISTORIAL / PROGRESO -->
-      <section id="viewStats" class="hidden space-y-4">
-        <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl p-4 text-white">
-          <span class="text-xs text-indigo-200">Resumen de consistencia de hábitos</span>
-          <h3 class="text-2xl font-black mt-1" id="statWeeklyRate">0%</h3>
-          <p class="text-xs text-indigo-100 mt-1">Cumplimiento promedio en los últimos 7 días</p>
+      <!-- 4. VISTA: GESTIÓN DE PLANTILLAS -->
+      <section id="viewManage" class="hidden space-y-4">
+        <div class="flex justify-between items-center mb-1 px-1">
+          <div>
+            <h2 class="text-sm font-bold text-zinc-900 dark:text-white">Plantilla de Hábitos</h2>
+            <p class="text-xs text-zinc-400">Se reinician automáticamente cada día a medianoche.</p>
+          </div>
         </div>
 
-        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider px-1">Últimos 14 días</h3>
+        <button onclick="openRoutineModal()" class="w-full py-3 bg-gold-400 hover:bg-gold-500 text-black font-extrabold text-xs rounded-2xl shadow-lg shadow-gold-500/10 flex items-center justify-center space-x-2 active:scale-[0.98] transition">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Añadir Hábito Fijo</span>
+        </button>
+
+        <div id="manageRoutinesList" class="space-y-2.5 pt-1"></div>
+      </section>
+
+      <!-- 5. VISTA: DATOS & COPIAS DE SEGURIDAD -->
+      <section id="viewStats" class="hidden space-y-4">
+        <!-- Tarjeta de consistencia -->
+        <div class="bg-gradient-to-br from-zinc-900 to-dark-800 rounded-3xl p-5 border border-zinc-800 text-white shadow-xl">
+          <span class="text-[10px] uppercase tracking-widest text-gold-400 font-bold">Consistencia Global</span>
+          <h3 class="text-3xl font-black mt-1 text-white" id="statWeeklyRate">0%</h3>
+          <p class="text-[11px] text-zinc-400 mt-1">Cumplimiento promedio en los últimos 7 días</p>
+        </div>
+
+        <!-- Copias de seguridad (Exportar / Importar) -->
+        <div class="p-4 bg-white dark:bg-dark-800 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 space-y-3 shadow-sm">
+          <h4 class="text-xs font-bold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-gold-400"></i>
+            <span>Copia de Seguridad y Respaldo</span>
+          </h4>
+          <p class="text-[11px] text-zinc-400">Guarda una copia de tus registros en tu móvil o restáurala si cambias de terminal.</p>
+          
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="exportBackupData()" class="py-2.5 px-3 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1.5 active:scale-95">
+              <i class="fa-solid fa-download text-gold-400"></i>
+              <span>Exportar JSON</span>
+            </button>
+
+            <label class="py-2.5 px-3 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-bold rounded-xl transition flex items-center justify-center space-x-1.5 active:scale-95 cursor-pointer text-center">
+              <i class="fa-solid fa-upload text-gold-400"></i>
+              <span>Importar JSON</span>
+              <input type="file" id="backupFileInput" accept=".json" class="hidden" onchange="importBackupData(event)">
+            </label>
+          </div>
+        </div>
+
+        <h4 class="text-xs font-bold text-zinc-400 uppercase tracking-wider px-1">Últimos 14 días</h4>
         <div id="historyList" class="space-y-2"></div>
       </section>
 
     </main>
 
-    <!-- MODAL GYM: Centrado en la pantalla (lejos de la barra inferior) -->
-    <div id="gymLogModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
+    <!-- MODAL: Historial Completo de un Ejercicio -->
+    <div id="exerciseHistoryModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-sm p-5 space-y-4 shadow-2xl animate-in fade-in">
+        <div class="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-700/60 pb-3">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-gold-400 tracking-wider">Histórico Detallado</span>
+            <h3 id="historyModalExerciseName" class="font-black text-zinc-900 dark:text-white text-base">Ejercicio</h3>
+          </div>
+          <button onclick="closeExerciseHistoryModal()" class="text-zinc-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <div id="exerciseHistoryDetailList" class="space-y-2 max-h-64 overflow-y-auto custom-scroll pr-1"></div>
+
+        <button onclick="closeExerciseHistoryModal()" class="w-full py-2.5 bg-zinc-100 dark:bg-dark-750 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl transition">
+          Cerrar
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL GYM: Registrar Serie / Carga -->
+    <div id="gymLogModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center">
           <div>
-            <span class="text-[10px] uppercase font-bold text-indigo-500 tracking-wider">Añadir Serie</span>
-            <h3 id="gymModalExerciseName" class="font-bold text-slate-800 text-base">Ejercicio</h3>
+            <span class="text-[10px] uppercase font-bold text-gold-400 tracking-wider">Añadir Serie</span>
+            <h3 id="gymModalExerciseName" class="font-bold text-zinc-900 dark:text-white text-base">Ejercicio</h3>
           </div>
-          <button onclick="closeGymLogModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <button onclick="closeGymLogModal()" class="text-zinc-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
@@ -214,28 +325,28 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Peso (kg)</label>
-            <input type="number" step="0.5" id="gymModalWeight" placeholder="0" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-zinc-400 mb-1">Peso (kg)</label>
+            <input type="number" step="0.5" id="gymModalWeight" placeholder="0" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-base font-black text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Reps</label>
-            <input type="number" id="gymModalReps" placeholder="10" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-base font-bold text-slate-800 focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-zinc-400 mb-1">Reps</label>
+            <input type="number" id="gymModalReps" placeholder="10" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-base font-black text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
           </div>
         </div>
 
         <div class="flex space-x-2 pt-2">
-          <button onclick="closeGymLogModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
-          <button onclick="saveGymSet()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar</button>
+          <button onclick="closeGymLogModal()" class="flex-1 py-3 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl transition">Cancelar</button>
+          <button onclick="saveGymSet()" class="flex-1 py-3 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl transition shadow-md shadow-gold-500/10">Guardar</button>
         </div>
       </div>
     </div>
 
-    <!-- MODAL HÁBITOS: Centrado en pantalla -->
-    <div id="routineModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
+    <!-- MODAL HÁBITOS: Crear / Editar -->
+    <div id="routineModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-xs p-6 space-y-4 shadow-2xl">
         <div class="flex justify-between items-center">
-          <h3 id="modalTitle" class="font-bold text-slate-800 text-base">Añadir Rutina</h3>
-          <button onclick="closeRoutineModal()" class="text-slate-400 hover:text-slate-600 p-1">
+          <h3 id="modalTitle" class="font-bold text-zinc-900 dark:text-white text-base">Añadir Hábito</h3>
+          <button onclick="closeRoutineModal()" class="text-zinc-400 hover:text-white p-1">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
@@ -243,18 +354,18 @@
         <input type="hidden" id="editRoutineId" value="">
 
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1">Nombre de la tarea</label>
-          <input type="text" id="routineNameInput" placeholder="Ej: Beber 2 vasos de agua" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 font-medium">
+          <label class="block text-xs font-semibold text-zinc-400 mb-1">Nombre</label>
+          <input type="text" id="routineNameInput" placeholder="Ej: Beber 500ml agua" class="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Emoji</label>
-            <input type="text" id="routineEmojiInput" value="⭐" maxlength="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-center text-base focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-zinc-400 mb-1">Emoji</label>
+            <input type="text" id="routineEmojiInput" value="⭐" maxlength="2" class="w-full px-3 py-2 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-center text-base focus:outline-none focus:border-gold-400">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-500 mb-1">Franja</label>
-            <select id="routineTimeSlotInput" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-indigo-500">
+            <label class="block text-xs font-semibold text-zinc-400 mb-1">Franja</label>
+            <select id="routineTimeSlotInput" class="w-full px-3 py-2.5 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
               <option value="morning">🌅 Mañana</option>
               <option value="afternoon">☀️ Tarde</option>
               <option value="night">🌙 Noche</option>
@@ -263,9 +374,10 @@
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-500 mb-1">Categoría</label>
-          <select id="routineCategoryInput" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-indigo-500">
+          <label class="block text-xs font-semibold text-zinc-400 mb-1">Categoría</label>
+          <select id="routineCategoryInput" class="w-full px-3 py-2 bg-zinc-50 dark:bg-dark-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-xs font-bold text-zinc-800 dark:text-zinc-100 focus:outline-none focus:border-gold-400">
             <option value="Salud">Salud & Bienestar</option>
+            <option value="Gimnasio">Gimnasio & Físico</option>
             <option value="Productividad">Productividad</option>
             <option value="Mentalidad">Mentalidad</option>
             <option value="Personal">Personal</option>
@@ -273,23 +385,23 @@
         </div>
 
         <div class="flex space-x-2 pt-2">
-          <button onclick="closeRoutineModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Cancelar</button>
-          <button onclick="saveRoutine()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-md shadow-indigo-100">Guardar</button>
+          <button onclick="closeRoutineModal()" class="flex-1 py-3 bg-zinc-100 dark:bg-dark-750 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl transition">Cancelar</button>
+          <button onclick="saveRoutine()" class="flex-1 py-3 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl transition shadow-md shadow-gold-500/10">Guardar</button>
         </div>
       </div>
     </div>
 
     <!-- MODAL BORRAR -->
-    <div id="deleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
-      <div class="bg-white rounded-3xl w-full max-w-xs p-5 text-center space-y-3 shadow-2xl">
-        <div class="w-12 h-12 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center mx-auto text-xl">
+    <div id="deleteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[99999] flex items-center justify-center p-4 hidden">
+      <div class="bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl w-full max-w-xs p-5 text-center space-y-3 shadow-2xl">
+        <div class="w-12 h-12 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto text-xl border border-rose-500/20">
           <i class="fa-solid fa-trash-can"></i>
         </div>
-        <h4 class="font-bold text-slate-800 text-sm">¿Eliminar esta rutina?</h4>
-        <p class="text-xs text-slate-500">Ya no aparecerá en tus días futuros.</p>
+        <h4 class="font-black text-zinc-900 dark:text-white text-sm">¿Eliminar este hábito?</h4>
+        <p class="text-xs text-zinc-400">No volverá a aparecer en los siguientes días.</p>
         <div class="flex space-x-2 pt-1">
-          <button onclick="closeDeleteModal()" class="flex-1 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">Cancelar</button>
-          <button id="btnConfirmDelete" class="flex-1 py-2 bg-rose-500 text-white text-xs font-bold rounded-xl shadow-md shadow-rose-100">Eliminar</button>
+          <button onclick="closeDeleteModal()" class="flex-1 py-2 bg-zinc-100 dark:bg-dark-750 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-xl">Cancelar</button>
+          <button id="btnConfirmDelete" class="flex-1 py-2 bg-rose-500 text-white text-xs font-bold rounded-xl shadow-md">Eliminar</button>
         </div>
       </div>
     </div>
@@ -303,29 +415,68 @@
       });
     }
 
-    // Exterminador de badges y widgets de Netlify
+    // Limpieza constante de cualquier inyección flotante residual
     setInterval(() => {
-      document.querySelectorAll('iframe#netlify-drawer, [data-netlify-deploy-preview], [data-netlify-badge], a[href*="netlify.com"]').forEach(el => {
-        el.remove();
-      });
-      // Buscar elementos flotantes inyectados al final del body
-      Array.from(document.body.children).forEach(child => {
-        if (child.tagName !== 'DIV' || !child.classList.contains('min-h-screen')) {
-          if (child.innerHTML && child.innerHTML.toLowerCase().includes('netlify')) {
-            child.remove();
-          }
-        }
-      });
-    }, 400);
+      document.querySelectorAll('iframe#netlify-drawer, [data-netlify-deploy-preview], [data-netlify-badge], a[href*="netlify.com"]').forEach(el => el.remove());
+    }, 500);
 
+    // Sistema de Audio Sintético Nativo (Web Audio API)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq = 587.33, type = 'sine', duration = 0.12) {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+        if ('vibrate' in navigator) navigator.vibrate(20);
+      } catch (e) {}
+    }
+
+    function playSuccessChime() {
+      playBeep(523.25, 'sine', 0.08);
+      setTimeout(() => playBeep(659.25, 'sine', 0.12), 70);
+    }
+
+    // Modo Oscuro / Claro
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme_preference') || 'dark';
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+      } else {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+      }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme_preference', 'light');
+        document.getElementById('themeIcon').className = 'fa-solid fa-sun';
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme_preference', 'dark');
+        document.getElementById('themeIcon').className = 'fa-solid fa-moon';
+      }
+      playBeep(440, 'triangle', 0.06);
+    }
+
+    // Datos maestros
     const DEFAULT_MASTER_ROUTINES = [
       { id: '1', title: 'Beber 500ml de agua', emoji: '💧', slot: 'morning', category: 'Salud' },
-      { id: '2', title: '10 min de meditación / silencio', emoji: '🧘', slot: 'morning', category: 'Mentalidad' },
+      { id: '2', title: '10 min de lectura / meditación', emoji: '🧘', slot: 'morning', category: 'Mentalidad' },
       { id: '3', title: 'Planificar el día', emoji: '📋', slot: 'morning', category: 'Productividad' },
-      { id: '4', title: 'Paseo o 30 min de ejercicio', emoji: '🏃', slot: 'afternoon', category: 'Salud' },
-      { id: '5', title: 'Revisar pendientes terminados', emoji: '✅', slot: 'afternoon', category: 'Productividad' },
-      { id: '6', title: 'Leer 15 páginas', emoji: '📖', slot: 'night', category: 'Mentalidad' },
-      { id: '7', title: 'Desconectar pantallas 30 min antes', emoji: '🌙', slot: 'night', category: 'Salud' }
+      { id: '4', title: 'Entrenamiento en Gym', emoji: '🏋️', slot: 'afternoon', category: 'Gimnasio' },
+      { id: '5', title: 'Desconectar pantallas 30 min antes', emoji: '🌙', slot: 'night', category: 'Salud' }
     ];
 
     const GYM_ROUTINES = {
@@ -355,6 +506,7 @@
     let masterRoutines = JSON.parse(localStorage.getItem('master_routines')) || DEFAULT_MASTER_ROUTINES;
     let daysRecord = JSON.parse(localStorage.getItem('days_record')) || {};
     let gymRecords = JSON.parse(localStorage.getItem('gym_records')) || {};
+    let bodyweightRecords = JSON.parse(localStorage.getItem('bodyweight_records')) || [];
     let activeDate = getTodayKey();
     let currentGymDay = 'pecho';
     let pendingDeleteId = null;
@@ -371,23 +523,17 @@
       }
     }
 
-    function saveMasters() {
-      localStorage.setItem('master_routines', JSON.stringify(masterRoutines));
-    }
-
-    function saveRecords() {
-      localStorage.setItem('days_record', JSON.stringify(daysRecord));
-    }
-
-    function saveGymRecords() {
-      localStorage.setItem('gym_records', JSON.stringify(gymRecords));
-    }
+    function saveMasters() { localStorage.setItem('master_routines', JSON.stringify(masterRoutines)); }
+    function saveRecords() { localStorage.setItem('days_record', JSON.stringify(daysRecord)); }
+    function saveGymRecords() { localStorage.setItem('gym_records', JSON.stringify(gymRecords)); }
+    function saveBodyweightRecords() { localStorage.setItem('bodyweight_records', JSON.stringify(bodyweightRecords)); }
 
     function changeDay(offset) {
       const parts = activeDate.split('-');
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
       d.setDate(d.getDate() + offset);
       activeDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      playBeep(400, 'sine', 0.05);
       render();
     }
 
@@ -397,10 +543,12 @@
       if (isDone) {
         delete daysRecord[activeDate].completedIds[id];
         delete daysRecord[activeDate].timestamps[id];
+        playBeep(330, 'sine', 0.08);
       } else {
         daysRecord[activeDate].completedIds[id] = true;
         const now = new Date();
         daysRecord[activeDate].timestamps[id] = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+        playSuccessChime();
       }
       saveRecords();
       render();
@@ -412,8 +560,7 @@
       
       const parts = activeDate.split('-');
       const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-      const options = { weekday: 'long', day: 'numeric', month: 'short' };
-      const dateFormatted = dateObj.toLocaleDateString('es-ES', options);
+      const dateFormatted = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
 
       document.getElementById('currentDateDisplay').innerText = activeDate === todayKey ? 'Hoy' : dateFormatted;
       document.getElementById('viewingDateLabel').innerText = activeDate === todayKey ? `Hoy, ${dateFormatted}` : dateFormatted;
@@ -441,30 +588,30 @@
           const item = document.createElement('div');
           item.className = `flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
             isDone 
-              ? 'bg-emerald-50/50 border-emerald-200/60 shadow-sm' 
-              : 'bg-white border-slate-200/70 hover:border-indigo-200 shadow-sm'
+              ? 'bg-gold-400/5 dark:bg-gold-400/10 border-gold-400/40 shadow-sm' 
+              : 'bg-white dark:bg-dark-800 border-zinc-200 dark:border-zinc-700/70 shadow-sm hover:border-gold-400/30'
           }`;
 
           item.innerHTML = `
             <div class="flex items-center space-x-3.5 flex-1 cursor-pointer" onclick="toggleCheck('${routine.id}')">
               <button class="w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
                 isDone 
-                  ? 'bg-emerald-500 border-emerald-500 text-white' 
-                  : 'border-slate-300 bg-slate-50'
+                  ? 'bg-gold-400 border-gold-400 text-black shadow-sm' 
+                  : 'border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-dark-900'
               }">
-                ${isDone ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                ${isDone ? '<i class="fa-solid fa-check text-xs font-black"></i>' : ''}
               </button>
               <div>
-                <p class="text-xs font-bold leading-tight ${isDone ? 'line-through text-slate-400' : 'text-slate-800'}">
+                <p class="text-xs font-extrabold leading-tight ${isDone ? 'line-through text-zinc-400 dark:text-zinc-500' : 'text-zinc-800 dark:text-zinc-100'}">
                   ${routine.emoji} ${routine.title}
                 </p>
                 <div class="flex items-center space-x-2 mt-0.5">
-                  <span class="text-[10px] text-slate-400 font-medium">${routine.category}</span>
-                  ${isDone ? `<span class="text-[10px] text-emerald-600 font-semibold">• Hecho ${time}</span>` : ''}
+                  <span class="text-[10px] text-zinc-400 font-semibold">${routine.category}</span>
+                  ${isDone ? `<span class="text-[10px] text-gold-500 font-bold">• ${time}</span>` : ''}
                 </div>
               </div>
             </div>
-            <button onclick="editRoutineFromDaily('${routine.id}')" class="p-1.5 text-slate-300 hover:text-indigo-600 active:scale-90 transition">
+            <button onclick="openRoutineModal('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-gold-400 active:scale-90 transition">
               <i class="fa-solid fa-pen text-xs"></i>
             </button>
           `;
@@ -483,13 +630,15 @@
       calculateStreak();
     }
 
+    // Gimnasio
     function selectGymRoutine(routineKey) {
       currentGymDay = routineKey;
       const isPecho = routineKey === 'pecho';
       
-      document.getElementById('btnDayPecho').className = `flex-1 py-2 text-xs font-bold rounded-xl transition ${isPecho ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`;
-      document.getElementById('btnDayEspalda').className = `flex-1 py-2 text-xs font-bold rounded-xl transition ${!isPecho ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-800'}`;
+      document.getElementById('btnDayPecho').className = `flex-1 py-2 text-xs font-black rounded-xl transition ${isPecho ? 'bg-gold-400 text-black shadow-md' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white'}`;
+      document.getElementById('btnDayEspalda').className = `flex-1 py-2 text-xs font-black rounded-xl transition ${!isPecho ? 'bg-gold-400 text-black shadow-md' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-white'}`;
       
+      playBeep(480, 'sine', 0.05);
       renderGymView();
     }
 
@@ -504,20 +653,20 @@
         const lastEntry = history.length > 0 ? history[history.length - 1] : null;
 
         const card = document.createElement('div');
-        card.className = 'bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm space-y-3';
+        card.className = 'bg-white dark:bg-dark-800 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-700/80 shadow-sm space-y-3';
         
         let historyMarkup = '';
         if (lastEntry) {
           historyMarkup = `
-            <div class="flex items-center justify-between text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-              <span class="text-slate-500 text-[11px]"><i class="fa-regular fa-clock mr-1"></i>Último: ${lastEntry.date}</span>
-              <span class="font-extrabold text-indigo-600">${lastEntry.weight} kg <span class="text-slate-400 font-normal">×</span> ${lastEntry.reps} reps</span>
+            <div class="flex items-center justify-between text-xs bg-zinc-50 dark:bg-dark-900 p-2.5 rounded-xl border border-zinc-100 dark:border-zinc-750">
+              <span class="text-zinc-400 text-[11px]"><i class="fa-regular fa-clock mr-1 text-gold-400"></i>${lastEntry.date}</span>
+              <span class="font-black text-gold-400">${lastEntry.weight} kg <span class="text-zinc-400 font-normal">×</span> ${lastEntry.reps} reps</span>
             </div>
           `;
         } else {
           historyMarkup = `
-            <div class="text-[11px] text-slate-400 italic bg-slate-50 p-2 rounded-xl text-center">
-              Sin registros todavía
+            <div class="text-[11px] text-zinc-400 italic bg-zinc-50 dark:bg-dark-900 p-2 rounded-xl text-center">
+              Sin registros guardados
             </div>
           `;
         }
@@ -525,13 +674,18 @@
         card.innerHTML = `
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-2.5">
-              <span class="text-xl bg-indigo-50 p-2 rounded-xl">${ex.icon}</span>
-              <h3 class="text-xs font-bold text-slate-800">${ex.name}</h3>
+              <span class="text-xl bg-zinc-100 dark:bg-dark-750 p-2 rounded-xl">${ex.icon}</span>
+              <h3 class="text-xs font-black text-zinc-900 dark:text-white">${ex.name}</h3>
             </div>
-            <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs font-bold rounded-xl transition active:scale-95 flex items-center space-x-1">
-              <i class="fa-solid fa-plus text-[10px]"></i>
-              <span>Añadir</span>
-            </button>
+            <div class="flex items-center space-x-1.5">
+              <button onclick="openExerciseHistoryModal('${ex.id}', '${ex.name}')" class="px-2.5 py-1.5 bg-zinc-100 dark:bg-dark-750 hover:bg-zinc-200 dark:hover:bg-dark-700 text-zinc-400 hover:text-gold-400 text-xs font-bold rounded-xl transition" title="Ver Historial Completo">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+              </button>
+              <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3 py-1.5 bg-gold-400 hover:bg-gold-500 text-black text-xs font-black rounded-xl transition active:scale-95 flex items-center space-x-1 shadow-sm">
+                <i class="fa-solid fa-plus text-[10px]"></i>
+                <span>Añadir</span>
+              </button>
+            </div>
           </div>
           ${historyMarkup}
         `;
@@ -562,24 +716,191 @@
 
       if (weight <= 0 && reps <= 0) return;
 
-      if (!gymRecords[exerciseId]) {
-        gymRecords[exerciseId] = [];
-      }
+      if (!gymRecords[exerciseId]) gymRecords[exerciseId] = [];
 
       const today = new Date();
       const dateStr = `${today.getDate()}/${today.getMonth() + 1}`;
 
       gymRecords[exerciseId].push({
+        id: Date.now().toString(),
         date: dateStr,
         weight: weight,
         reps: reps
       });
 
       saveGymRecords();
+      playSuccessChime();
       closeGymLogModal();
       renderGymView();
     }
 
+    // Historial Detallado de Ejercicio
+    function openExerciseHistoryModal(exerciseId, exerciseName) {
+      document.getElementById('historyModalExerciseName').innerText = exerciseName;
+      const historyList = document.getElementById('exerciseHistoryDetailList');
+      historyList.innerHTML = '';
+
+      const history = gymRecords[exerciseId] || [];
+
+      if (history.length === 0) {
+        historyList.innerHTML = '<p class="text-xs text-zinc-400 text-center py-6">No hay series registradas aún.</p>';
+      } else {
+        [...history].reverse().forEach((entry) => {
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between p-3 bg-zinc-50 dark:bg-dark-900 border border-zinc-100 dark:border-zinc-750 rounded-xl text-xs';
+          row.innerHTML = `
+            <div class="flex items-center space-x-2">
+              <span class="text-zinc-400 text-[10px] font-semibold">${entry.date}</span>
+              <span class="font-black text-gold-400">${entry.weight} kg × ${entry.reps} reps</span>
+            </div>
+            <button onclick="deleteExerciseEntry('${exerciseId}', '${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1">
+              <i class="fa-solid fa-trash text-xs"></i>
+            </button>
+          `;
+          historyList.appendChild(row);
+        });
+      }
+
+      document.getElementById('exerciseHistoryModal').classList.remove('hidden');
+    }
+
+    function closeExerciseHistoryModal() {
+      document.getElementById('exerciseHistoryModal').classList.add('hidden');
+    }
+
+    function deleteExerciseEntry(exerciseId, entryId) {
+      if (gymRecords[exerciseId]) {
+        gymRecords[exerciseId] = gymRecords[exerciseId].filter(e => e.id !== entryId);
+        saveGymRecords();
+        openExerciseHistoryModal(exerciseId, document.getElementById('historyModalExerciseName').innerText);
+        renderGymView();
+      }
+    }
+
+    // Peso Corporal
+    function logBodyweight() {
+      const input = document.getElementById('inputNewWeight');
+      const val = parseFloat(input.value);
+      if (!val || val <= 30 || val >= 300) return;
+
+      const today = new Date();
+      const dateStr = `${today.getDate()}/${today.getMonth() + 1}`;
+
+      bodyweightRecords.unshift({
+        id: Date.now().toString(),
+        date: dateStr,
+        weight: val
+      });
+
+      saveBodyweightRecords();
+      input.value = '';
+      playSuccessChime();
+      renderBodyweightView();
+    }
+
+    function deleteBodyweightEntry(id) {
+      bodyweightRecords = bodyweightRecords.filter(b => b.id !== id);
+      saveBodyweightRecords();
+      renderBodyweightView();
+    }
+
+    function renderBodyweightView() {
+      const currDisplay = document.getElementById('currentBodyweightDisplay');
+      const diffDisplay = document.getElementById('weightDiffDisplay');
+      const list = document.getElementById('bodyweightHistoryList');
+      list.innerHTML = '';
+
+      if (bodyweightRecords.length > 0) {
+        const latest = bodyweightRecords[0].weight;
+        currDisplay.innerText = latest;
+
+        if (bodyweightRecords.length > 1) {
+          const prev = bodyweightRecords[1].weight;
+          const diff = (latest - prev).toFixed(1);
+          const sign = diff > 0 ? `+${diff}` : `${diff}`;
+          diffDisplay.innerText = `${sign} kg respecto al anterior (${bodyweightRecords[1].date})`;
+        } else {
+          diffDisplay.innerText = `Primer registro completado`;
+        }
+      } else {
+        currDisplay.innerText = '--';
+        diffDisplay.innerText = 'Registra tu peso de hoy en ayunas';
+      }
+
+      bodyweightRecords.forEach((entry, idx) => {
+        let comp = '';
+        if (idx < bodyweightRecords.length - 1) {
+          const nextOld = bodyweightRecords[idx + 1].weight;
+          const d = (entry.weight - nextOld).toFixed(1);
+          comp = d >= 0 ? `<span class="text-gold-400 font-bold text-[10px]">+${d} kg</span>` : `<span class="text-emerald-400 font-bold text-[10px]">${d} kg</span>`;
+        }
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between p-3 bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700/80 rounded-xl text-xs';
+        row.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="text-zinc-400 font-semibold text-[11px]">${entry.date}</span>
+            <span class="font-black text-zinc-900 dark:text-white text-sm">${entry.weight} kg</span>
+            ${comp}
+          </div>
+          <button onclick="deleteBodyweightEntry('${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1">
+            <i class="fa-solid fa-trash text-xs"></i>
+          </button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    // Copias de Seguridad (Exportar / Importar)
+    function exportBackupData() {
+      const data = {
+        version: 1,
+        exportDate: new Date().toISOString(),
+        masterRoutines,
+        daysRecord,
+        gymRecords,
+        bodyweightRecords
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `rutinas_backup_${getTodayKey()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      playSuccessChime();
+    }
+
+    function importBackupData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.masterRoutines) masterRoutines = parsed.masterRoutines;
+          if (parsed.daysRecord) daysRecord = parsed.daysRecord;
+          if (parsed.gymRecords) gymRecords = parsed.gymRecords;
+          if (parsed.bodyweightRecords) bodyweightRecords = parsed.bodyweightRecords;
+
+          saveMasters();
+          saveRecords();
+          saveGymRecords();
+          saveBodyweightRecords();
+
+          playSuccessChime();
+          alert('¡Copia de seguridad restaurada con éxito!');
+          render();
+        } catch (err) {
+          alert('Archivo de copia de seguridad no válido.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Gestión de Hábitos
     function renderManageView() {
       const list = document.getElementById('manageRoutinesList');
       list.innerHTML = '';
@@ -587,13 +908,13 @@
       masterRoutines.forEach(routine => {
         const slotLabels = { morning: 'Mañana', afternoon: 'Tarde', night: 'Noche' };
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80';
+        row.className = 'flex items-center justify-between p-3.5 bg-zinc-50 dark:bg-dark-800 rounded-2xl border border-zinc-200 dark:border-zinc-700/80';
         row.innerHTML = `
           <div class="flex items-center space-x-3">
-            <span class="text-xl bg-white p-2 rounded-xl shadow-xs border border-slate-100">${routine.emoji}</span>
+            <span class="text-xl bg-white dark:bg-dark-750 p-2 rounded-xl border border-zinc-200 dark:border-zinc-700">${routine.emoji}</span>
             <div>
-              <p class="text-xs font-bold text-slate-800">${routine.title}</p>
-              <div class="flex items-center space-x-2 text-[10px] text-slate-400 font-medium">
+              <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${routine.title}</p>
+              <div class="flex items-center space-x-2 text-[10px] text-zinc-400 font-medium">
                 <span>${slotLabels[routine.slot]}</span>
                 <span>•</span>
                 <span>${routine.category}</span>
@@ -601,10 +922,10 @@
             </div>
           </div>
           <div class="flex items-center space-x-1">
-            <button onclick="openRoutineModal('${routine.id}')" class="p-2 text-slate-400 hover:text-indigo-600 active:scale-90 transition">
+            <button onclick="openRoutineModal('${routine.id}')" class="p-2 text-zinc-400 hover:text-gold-400 active:scale-90 transition">
               <i class="fa-solid fa-pen text-xs"></i>
             </button>
-            <button onclick="promptDelete('${routine.id}')" class="p-2 text-slate-400 hover:text-rose-500 active:scale-90 transition">
+            <button onclick="promptDelete('${routine.id}')" class="p-2 text-zinc-400 hover:text-rose-500 active:scale-90 transition">
               <i class="fa-solid fa-trash text-xs"></i>
             </button>
           </div>
@@ -624,14 +945,14 @@
 
       if (id) {
         const r = masterRoutines.find(x => x.id === id);
-        title.innerText = 'Editar Rutina';
+        title.innerText = 'Editar Hábito';
         editId.value = r.id;
         nameInput.value = r.title;
         emojiInput.value = r.emoji;
         slotInput.value = r.slot;
         catInput.value = r.category;
       } else {
-        title.innerText = 'Nueva Rutina Fija';
+        title.innerText = 'Nuevo Hábito Fijo';
         editId.value = '';
         nameInput.value = '';
         emojiInput.value = '⭐';
@@ -641,13 +962,7 @@
       modal.classList.remove('hidden');
     }
 
-    function editRoutineFromDaily(id) {
-      openRoutineModal(id);
-    }
-
-    function closeRoutineModal() {
-      document.getElementById('routineModal').classList.add('hidden');
-    }
+    function closeRoutineModal() { document.getElementById('routineModal').classList.add('hidden'); }
 
     function saveRoutine() {
       const id = document.getElementById('editRoutineId').value;
@@ -667,16 +982,11 @@
           item.category = category;
         }
       } else {
-        masterRoutines.push({
-          id: Date.now().toString(),
-          title,
-          emoji,
-          slot,
-          category
-        });
+        masterRoutines.push({ id: Date.now().toString(), title, emoji, slot, category });
       }
 
       saveMasters();
+      playSuccessChime();
       closeRoutineModal();
       render();
     }
@@ -695,6 +1005,7 @@
       if (pendingDeleteId) {
         masterRoutines = masterRoutines.filter(r => r.id !== pendingDeleteId);
         saveMasters();
+        playBeep(260, 'sawtooth', 0.1);
         closeDeleteModal();
         render();
       }
@@ -703,23 +1014,16 @@
     function calculateStreak() {
       let streak = 0;
       let curr = new Date();
-      
       while (true) {
         const key = `${curr.getFullYear()}-${String(curr.getMonth()+1).padStart(2,'0')}-${String(curr.getDate()).padStart(2,'0')}`;
         const rec = daysRecord[key];
-        
         if (rec && masterRoutines.length > 0) {
           const completedCount = Object.keys(rec.completedIds || {}).length;
-          const ratio = completedCount / masterRoutines.length;
-          if (ratio >= 0.6) {
+          if (completedCount / masterRoutines.length >= 0.6) {
             streak++;
             curr.setDate(curr.getDate() - 1);
-          } else {
-            break;
-          }
-        } else {
-          break;
-        }
+          } else break;
+        } else break;
       }
       document.getElementById('streakCount').innerText = streak;
     }
@@ -727,7 +1031,6 @@
     function renderStats() {
       const historyEl = document.getElementById('historyList');
       historyEl.innerHTML = '';
-
       let totalPct = 0;
       let countedDays = 0;
 
@@ -747,14 +1050,13 @@
         }
 
         const dateTitle = i === 0 ? 'Hoy' : (i === 1 ? 'Ayer' : d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }));
-
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs';
+        row.className = 'flex items-center justify-between p-3 bg-white dark:bg-dark-800 border border-zinc-200 dark:border-zinc-700/80 rounded-xl text-xs';
         row.innerHTML = `
-          <span class="font-bold text-slate-700 capitalize">${dateTitle}</span>
+          <span class="font-bold text-zinc-700 dark:text-zinc-200 capitalize">${dateTitle}</span>
           <div class="flex items-center space-x-3">
-            <span class="text-slate-400 font-medium">${done}/${total} hechas</span>
-            <span class="font-extrabold ${pct >= 80 ? 'text-emerald-500' : (pct >= 40 ? 'text-amber-500' : 'text-slate-400')}">${pct}%</span>
+            <span class="text-zinc-400 font-medium">${done}/${total} hechos</span>
+            <span class="font-black ${pct >= 80 ? 'text-gold-400' : (pct >= 40 ? 'text-amber-500' : 'text-zinc-400')}">${pct}%</span>
           </div>
         `;
         historyEl.appendChild(row);
@@ -767,32 +1069,36 @@
     function switchTab(tab) {
       document.getElementById('viewDaily').classList.toggle('hidden', tab !== 'daily');
       document.getElementById('viewGym').classList.toggle('hidden', tab !== 'gym');
+      document.getElementById('viewBodyweight').classList.toggle('hidden', tab !== 'bodyweight');
       document.getElementById('viewManage').classList.toggle('hidden', tab !== 'manage');
       document.getElementById('viewStats').classList.toggle('hidden', tab !== 'stats');
       
       document.getElementById('dateSelectorBar').classList.toggle('hidden', tab !== 'daily');
       document.getElementById('dailyProgressContainer').classList.toggle('hidden', tab !== 'daily');
 
-      const tabs = ['daily', 'gym', 'manage', 'stats'];
+      const tabs = ['daily', 'gym', 'bodyweight', 'manage', 'stats'];
       tabs.forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
         if (t === tab) {
-          btn.className = 'flex-1 py-1.5 font-bold rounded-xl bg-white text-indigo-600 shadow-sm transition-all flex items-center justify-center space-x-1';
+          btn.className = 'flex-1 py-1.5 rounded-xl bg-gold-400 text-black shadow-md shadow-gold-500/20 font-black transition-all flex items-center justify-center space-x-1';
         } else {
-          btn.className = 'flex-1 py-1.5 font-bold rounded-xl text-indigo-200 hover:text-white transition-all flex items-center justify-center space-x-1';
+          btn.className = 'flex-1 py-1.5 rounded-xl text-zinc-400 hover:text-gold-300 transition-all font-bold flex items-center justify-center space-x-1';
         }
       });
 
+      playBeep(500, 'triangle', 0.04);
       render();
     }
 
     function render() {
       renderDailyView();
       renderGymView();
+      renderBodyweightView();
       renderManageView();
       renderStats();
     }
 
+    initTheme();
     render();
   </script>
 </body>
