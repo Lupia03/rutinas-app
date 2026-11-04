@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#060609">
-  <title>Inazuma & Poké 3D Pro Tracker</title>
+  <title>Inazuma & Poké Medals 3D Tracker</title>
   <link rel="manifest" href="manifest.json">
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Google Fonts: Chakra Petch & Teko para impacto 3D -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
@@ -24,7 +24,7 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Librería 3D: Vanilla-Tilt.js (Efecto 3D Holográfico y Profundidad) -->
+  <!-- Vanilla-Tilt.js (Efecto 3D Holográfico) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
   <script>
@@ -86,9 +86,7 @@
       z-index: -9999 !important;
     }
 
-    /* ==================== SISTEMA DE DISEÑO 3D ==================== */
-
-    /* Cabecera Chasis 3D */
+    /* Chasis 3D */
     .header-chassis-3d {
       background: radial-gradient(circle at 50% 0%, #252538 0%, #0a0a10 75%, #050508 100%);
       box-shadow: 
@@ -97,18 +95,15 @@
         inset 0 2px 3px rgba(255, 255, 255, 0.15);
     }
 
-    /* Tarjetas 3D con Extrusión Física y Bisel Superior */
+    /* Tarjetas 3D */
     .card-3d {
       background: linear-gradient(165deg, #1e1e2d 0%, #101018 100%);
       border-top: 1px solid rgba(255, 255, 255, 0.14);
       border-left: 1px solid rgba(255, 255, 255, 0.06);
       border-right: 1px solid rgba(0, 0, 0, 0.6);
       border-bottom: 5px solid #040407;
-      box-shadow: 
-        0 10px 20px -4px rgba(0, 0, 0, 0.7),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.7);
       transform-style: preserve-3d;
-      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), border-bottom-width 0.15s ease, box-shadow 0.15s ease;
     }
     html:not(.dark) .card-3d {
       background: linear-gradient(165deg, #ffffff 0%, #f1f5f9 100%);
@@ -119,77 +114,57 @@
       box-shadow: 0 8px 18px -4px rgba(15, 23, 42, 0.12);
     }
 
-    /* Tarjeta 3D Completada (Dorada con Relieve) */
     .card-3d-gold {
       background: linear-gradient(165deg, rgba(250, 204, 21, 0.22) 0%, rgba(161, 98, 7, 0.12) 100%);
       border-top: 1px solid rgba(253, 224, 71, 0.5);
       border-left: 3px solid #facc15;
       border-right: 1px solid rgba(202, 138, 4, 0.3);
       border-bottom: 5px solid #854d0e;
-      box-shadow: 
-        0 10px 20px -5px rgba(250, 204, 21, 0.2),
-        inset 0 1px 2px rgba(253, 224, 71, 0.25);
+      box-shadow: 0 10px 20px -5px rgba(250, 204, 21, 0.2);
     }
 
-    /* Botón Mecánico 3D Amarillo Relámpago */
     .btn-3d-volt {
       background: linear-gradient(180deg, #fde047 0%, #facc15 55%, #eab308 100%);
       border-top: 1px solid #fef08a;
       border-bottom: 4px solid #a16207;
-      box-shadow: 
-        0 6px 14px -2px rgba(250, 204, 21, 0.45),
-        inset 0 1px 1px rgba(255, 255, 255, 0.8);
+      box-shadow: 0 6px 14px -2px rgba(250, 204, 21, 0.45);
       transition: all 0.1s ease;
     }
     .btn-3d-volt:active {
       transform: translateY(3px);
       border-bottom-width: 1px;
-      box-shadow: 0 2px 6px rgba(250, 204, 21, 0.3);
     }
 
-    /* Botón Mecánico 3D Oscuro */
     .btn-3d-dark {
       background: linear-gradient(180deg, #27273a 0%, #161622 100%);
       border-top: 1px solid rgba(255, 255, 255, 0.14);
       border-bottom: 4px solid #06060a;
       box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
-      transition: all 0.1s ease;
     }
     .btn-3d-dark:active {
       transform: translateY(3px);
       border-bottom-width: 1px;
     }
 
-    /* Ranura / Cavidad 3D Hundida (Inset Trench) */
     .trench-3d {
       background: #06060a;
-      box-shadow: 
-        inset 0 3px 6px rgba(0, 0, 0, 0.9),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-        0 1px 0 rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     }
     html:not(.dark) .trench-3d {
       background: #e2e8f0;
       box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15);
     }
 
-    /* Tubo de Energía Líquida 3D */
     .tube-3d-fill {
       background: linear-gradient(90deg, #eab308 0%, #facc15 50%, #fef08a 100%);
-      box-shadow: 
-        0 0 12px rgba(250, 204, 21, 0.7),
-        inset 0 2px 2px rgba(255, 255, 255, 0.8),
-        inset 0 -2px 2px rgba(161, 98, 7, 0.8);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.7);
     }
 
-    /* Pedestal Holográfico 3D para Pokémon */
     .holo-pedestal {
       background: radial-gradient(ellipse at center, rgba(250, 204, 21, 0.45) 0%, rgba(250, 204, 21, 0.1) 45%, transparent 72%);
       transform: rotateX(65deg);
-      box-shadow: 0 0 20px rgba(250, 204, 21, 0.35);
     }
 
-    /* Sombra y Volumen para el Render 3D del Pokémon */
     .pokemon-3d-render {
       filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 12px rgba(250, 204, 21, 0.25));
       transform: translateZ(35px);
@@ -203,44 +178,30 @@
       animation: levitate3D 3.2s ease-in-out infinite;
     }
 
-    /* Texto con Relieve 3D */
     .text-3d {
       text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8), 0 4px 10px rgba(0, 0, 0, 0.5);
     }
 
-    .custom-scroll::-webkit-scrollbar {
-      display: none;
-    }
-    .custom-scroll {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    .custom-scroll::-webkit-scrollbar { display: none; }
+    .custom-scroll { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-zinc-200 dark:bg-pitch-950 text-zinc-900 dark:text-zinc-100 antialiased min-h-screen flex justify-center transition-colors duration-300">
 
-  <!-- Contenedor Móvil Estilo Consola 3D -->
   <div class="w-full max-w-md bg-zinc-100 dark:bg-pitch-900 min-h-screen shadow-[0_0_50px_rgba(0,0,0,0.9)] flex flex-col relative pb-24 border-x border-zinc-300 dark:border-zinc-800/80">
     
     <!-- CABECERA CHASIS 3D -->
     <header class="header-chassis-3d text-white p-4 pt-6 rounded-b-[2.4rem] sticky top-0 z-30 relative overflow-hidden">
-      <!-- Iluminación ambiental superior -->
       <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-72 h-32 bg-volt-400/15 blur-3xl pointer-events-none"></div>
 
-      <!-- Fila Superior: Cápsula 3D de Pokémon + Nivel + Racha -->
       <div class="flex justify-between items-center relative z-10">
         <div class="flex items-center space-x-3.5">
-          <!-- Plataforma 3D del Compañero -->
           <button onclick="switchTab('partners')" class="relative group focus:outline-none">
             <div class="w-16 h-16 rounded-2xl btn-3d-dark p-1 flex flex-col items-center justify-center relative overflow-visible border border-volt-400/40">
-              <!-- Aura trasera -->
               <div class="absolute inset-1 rounded-xl bg-gradient-to-b from-volt-400/20 to-transparent"></div>
-              <!-- Imagen 3D Pokémon HOME -->
               <img id="headerPartnerSprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png" alt="Partner 3D" class="w-14 h-14 object-contain pokemon-3d-render animate-levitate z-10 -mt-1">
-              <!-- Disco holográfico base -->
               <div class="w-10 h-2.5 holo-pedestal rounded-full -mt-2"></div>
             </div>
-            <!-- Placa 3D de Nivel -->
             <span class="absolute -bottom-1.5 -right-1.5 btn-3d-volt text-pitch-950 font-hud font-black text-[10px] px-2 py-0.5 rounded-lg">
               NV.<span id="playerLevel">1</span>
             </span>
@@ -262,19 +223,17 @@
         </div>
 
         <div class="flex items-center space-x-2">
-          <!-- Contador Racha 3D -->
           <div class="btn-3d-dark px-3 py-1.5 rounded-xl flex items-center space-x-1.5 border border-volt-400/30">
             <span class="text-volt-400 text-xs drop-shadow-[0_0_6px_rgba(250,204,21,0.8)]">🔥</span>
             <span id="streakCount" class="font-hud font-black text-sm text-volt-400 text-3d">0</span>
           </div>
-          <!-- Botón Tema 3D -->
           <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl btn-3d-dark flex items-center justify-center text-volt-400 text-xs">
             <i id="themeIcon" class="fa-solid fa-moon"></i>
           </button>
         </div>
       </div>
 
-      <!-- Panel Hundido 3D de Energía y Experiencia -->
+      <!-- Panel Hundido 3D -->
       <div id="dailyProgressContainer" class="mt-4 trench-3d p-3.5 rounded-2xl relative z-10 space-y-2.5">
         <div>
           <div class="flex justify-between items-center text-[10px] font-hud uppercase tracking-wider mb-1.5">
@@ -288,7 +247,6 @@
           </div>
         </div>
 
-        <!-- Barra 2: EXP 3D -->
         <div class="pt-1.5 border-t border-zinc-800/80 flex items-center justify-between text-[10px] font-hud text-zinc-400">
           <span>PODER TOTAL: <strong id="totalXpDisplay" class="text-volt-400">0</strong> EXP</span>
           <div class="flex items-center space-x-2 w-1/2">
@@ -300,30 +258,30 @@
         </div>
       </div>
 
-      <!-- BOTONERA TÁCTICA 3D (5 Pestañas con Relieve Mecánico) -->
-      <div class="mt-4 trench-3d p-1.5 rounded-2xl flex justify-between items-center gap-1 text-[10px] font-hud font-bold uppercase tracking-wider relative z-10">
-        <button onclick="switchTab('daily')" id="nav-daily" class="flex-1 py-2 rounded-xl btn-3d-volt text-pitch-950 font-black flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-bolt"></i>
+      <!-- BOTONERA TÁCTICA 3D (6 Pestañas con Medallas) -->
+      <div class="mt-4 trench-3d p-1.5 rounded-2xl grid grid-cols-6 gap-1 text-[9px] font-hud font-bold uppercase tracking-wider relative z-10 text-center">
+        <button onclick="switchTab('daily')" id="nav-daily" class="py-2 rounded-xl btn-3d-volt text-pitch-950 font-black flex flex-col items-center justify-center">
+          <i class="fa-solid fa-bolt text-xs"></i>
           <span>Hoy</span>
         </button>
-
-        <button onclick="switchTab('gym')" id="nav-gym" class="flex-1 py-2 rounded-xl text-zinc-400 hover:text-white transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-dumbbell"></i>
+        <button onclick="switchTab('gym')" id="nav-gym" class="py-2 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center">
+          <i class="fa-solid fa-dumbbell text-xs"></i>
           <span>Gym</span>
         </button>
-
-        <button onclick="switchTab('partners')" id="nav-partners" class="flex-1 py-2 rounded-xl text-zinc-400 hover:text-white transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-dragon"></i>
+        <button onclick="switchTab('medals')" id="nav-medals" class="py-2 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center">
+          <i class="fa-solid fa-medal text-xs"></i>
+          <span>Medallas</span>
+        </button>
+        <button onclick="switchTab('partners')" id="nav-partners" class="py-2 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center">
+          <i class="fa-solid fa-dragon text-xs"></i>
           <span>3D Dex</span>
         </button>
-
-        <button onclick="switchTab('bodyweight')" id="nav-bodyweight" class="flex-1 py-2 rounded-xl text-zinc-400 hover:text-white transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-weight-scale"></i>
+        <button onclick="switchTab('bodyweight')" id="nav-bodyweight" class="py-2 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center">
+          <i class="fa-solid fa-weight-scale text-xs"></i>
           <span>Físico</span>
         </button>
-
-        <button onclick="switchTab('stats')" id="nav-stats" class="flex-1 py-2 rounded-xl text-zinc-400 hover:text-white transition-all flex items-center justify-center space-x-1">
-          <i class="fa-solid fa-cube"></i>
+        <button onclick="switchTab('stats')" id="nav-stats" class="py-2 rounded-xl text-zinc-400 hover:text-white flex flex-col items-center justify-center">
+          <i class="fa-solid fa-cube text-xs"></i>
           <span>Ficha</span>
         </button>
       </div>
@@ -348,7 +306,7 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="flex-1 p-4 overflow-y-auto custom-scroll space-y-5">
       
-      <!-- 1. VISTA: HOY (MISIONES CON EXTRUSIÓN 3D) -->
+      <!-- 1. VISTA: HOY -->
       <section id="viewDaily" class="space-y-5">
         <div>
           <div class="flex items-center space-x-2 text-volt-600 dark:text-volt-400 font-hud font-black text-xs uppercase tracking-widest mb-2.5 px-1">
@@ -385,13 +343,13 @@
         </div>
       </section>
 
-      <!-- 2. VISTA: GYM (MÓDULOS DE PESO 3D) -->
+      <!-- 2. VISTA: GYM -->
       <section id="viewGym" class="hidden space-y-4">
         <div class="flex space-x-2 p-1.5 trench-3d rounded-2xl">
           <button id="btnDayPecho" onclick="selectGymRoutine('pecho')" class="flex-1 py-2.5 text-xs font-hud font-black uppercase tracking-wider rounded-xl btn-3d-volt text-pitch-950">
             ⚡ Pecho & Tríceps
           </button>
-          <button id="btnDayEspalda" onclick="selectGymRoutine('espalda')" class="flex-1 py-2.5 text-xs font-hud font-bold uppercase tracking-wider rounded-xl text-zinc-400 hover:text-white transition">
+          <button id="btnDayEspalda" onclick="selectGymRoutine('espalda')" class="flex-1 py-2.5 text-xs font-hud font-black uppercase tracking-wider rounded-xl text-zinc-400 hover:text-white transition">
             🛡️ Espalda, Brazo & Hombro
           </button>
         </div>
@@ -407,14 +365,33 @@
         <div id="gymExerciseList" class="space-y-3.5"></div>
       </section>
 
-      <!-- 3. VISTA: CÁMARA HOLOGRÁFICA 3D DE COMPAÑEROS POKÉMON -->
+      <!-- 3. VISTA: MEDALLAS DE GIMNASIO POKÉMON / LOGROS -->
+      <section id="viewMedals" class="hidden space-y-4">
+        <div class="card-3d p-5 rounded-3xl text-white relative overflow-hidden">
+          <div class="absolute right-3 top-3 text-volt-400/10 text-6xl pointer-events-none">
+            <i class="fa-solid fa-medal"></i>
+          </div>
+          <span class="text-[10px] font-hud uppercase tracking-widest text-volt-400 font-black">Liga Pokémon & Futsal Pro</span>
+          <h2 class="text-xl font-hud font-black uppercase text-white text-3d mt-0.5">Galería de Medallas 3D</h2>
+          <p class="text-xs text-zinc-400 mt-1">Conquista hitos en tus hábitos y entrenamientos para coleccionar las medallas oficiales de gimnasio.</p>
+          <div class="mt-3 flex items-center space-x-2">
+            <span class="text-xs font-hud font-black bg-volt-400 text-pitch-950 px-3 py-1 rounded-lg">
+              DESBLOQUEADAS: <span id="unlockedMedalsCount">0</span> / <span id="totalMedalsCount">6</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Cuadrícula de Medallas -->
+        <div id="medalsGrid" class="grid grid-cols-2 gap-3.5"></div>
+      </section>
+
+      <!-- 4. VISTA: 3D DEX (COMPAÑEROS POKÉMON) -->
       <section id="viewPartners" class="hidden space-y-5">
-        <!-- Carta Holográfica 3D Interactiva (Con Vanilla-Tilt) -->
         <div id="heroPartnerTiltCard" data-tilt data-tilt-max="12" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.35" class="card-3d p-5 rounded-3xl border-t-2 border-volt-400/60 text-white relative overflow-hidden flex items-center justify-between cursor-grab">
           <div class="absolute -right-10 -top-10 w-40 h-40 bg-volt-400/10 rounded-full blur-2xl pointer-events-none"></div>
           
           <div class="space-y-1.5 z-10 pr-2" style="transform: translateZ(25px)">
-            <span class="text-[10px] font-hud uppercase tracking-widest text-volt-400 font-black block">★ Carta Holográfica 3D</span>
+            <span class="text-[10px] font-hud uppercase tracking-widest text-volt-400 font-black block">★ Compañero Titular</span>
             <h2 id="activePartnerCardName" class="text-2xl font-hud font-black uppercase text-white text-3d">Pikachu</h2>
             <p id="activePartnerCardDesc" class="text-xs text-zinc-300 leading-relaxed">Velocidad eléctrica en banda. Aumenta tu motivación diaria.</p>
             <div class="pt-2 flex items-center space-x-2">
@@ -423,7 +400,6 @@
             </div>
           </div>
 
-          <!-- Escenario 3D del Pokémon Titular -->
           <div class="w-28 h-28 flex flex-col items-center justify-center shrink-0 relative" style="transform: translateZ(45px)">
             <img id="activePartnerCardSprite" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png" class="w-24 h-24 object-contain pokemon-3d-render animate-levitate z-10" alt="Pokemon 3D">
             <div class="w-20 h-4 holo-pedestal rounded-full -mt-2"></div>
@@ -437,11 +413,10 @@
           </div>
         </div>
 
-        <!-- Cuadrícula 3D de Compañeros Pokémon -->
         <div id="pokemonGrid" class="grid grid-cols-2 gap-3.5"></div>
       </section>
 
-      <!-- 4. VISTA: FÍSICO / PESO CORPORAL 3D -->
+      <!-- 5. VISTA: FÍSICO / PESO CORPORAL -->
       <section id="viewBodyweight" class="hidden space-y-4">
         <div data-tilt data-tilt-max="8" data-tilt-glare="true" data-tilt-max-glare="0.2" class="card-3d p-5 rounded-3xl text-white relative overflow-hidden">
           <span class="text-[10px] font-hud uppercase tracking-widest text-volt-400 font-bold">Biometría 3D • Futsal Pro</span>
@@ -468,7 +443,7 @@
         </div>
       </section>
 
-      <!-- 5. VISTA: FICHA DE JUGADOR 3D (RADAR & BACKUP) -->
+      <!-- 6. VISTA: FICHA DE JUGADOR (RADAR & BACKUP) -->
       <section id="viewStats" class="hidden space-y-4">
         <div data-tilt data-tilt-max="6" class="card-3d rounded-3xl p-4 text-white">
           <div class="flex justify-between items-center mb-2">
@@ -524,7 +499,7 @@
 
     </main>
 
-    <!-- MODAL: Gestión de Plantilla -->
+    <!-- MODALES -->
     <div id="manageModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99990] flex items-center justify-center p-4 hidden">
       <div class="card-3d rounded-3xl w-full max-w-sm p-5 space-y-4 max-h-[85vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -550,7 +525,6 @@
       </div>
     </div>
 
-    <!-- MODAL: Historial Completo de Ejercicio -->
     <div id="exerciseHistoryModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99999] flex items-center justify-center p-4 hidden">
       <div class="card-3d rounded-3xl w-full max-w-sm p-5 space-y-4">
         <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -571,7 +545,6 @@
       </div>
     </div>
 
-    <!-- MODAL GYM: Añadir Serie 3D -->
     <div id="gymLogModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99999] flex items-center justify-center p-4 hidden">
       <div class="card-3d rounded-3xl w-full max-w-xs p-6 space-y-4">
         <div class="flex justify-between items-center">
@@ -604,7 +577,6 @@
       </div>
     </div>
 
-    <!-- MODAL HÁBITOS: Crear / Editar -->
     <div id="routineModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99999] flex items-center justify-center p-4 hidden">
       <div class="card-3d rounded-3xl w-full max-w-xs p-6 space-y-4">
         <div class="flex justify-between items-center">
@@ -653,7 +625,6 @@
       </div>
     </div>
 
-    <!-- MODAL BORRAR -->
     <div id="deleteModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[99999] flex items-center justify-center p-4 hidden">
       <div class="card-3d rounded-3xl w-full max-w-xs p-5 text-center space-y-3">
         <div class="w-12 h-12 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto text-xl border border-rose-500/20">
@@ -676,106 +647,73 @@
       });
     }
 
-    // Limpieza constante de inyecciones residuales
     setInterval(() => {
       document.querySelectorAll('iframe#netlify-drawer, [data-netlify-deploy-preview], [data-netlify-badge], a[href*="netlify.com"]').forEach(el => el.remove());
     }, 500);
 
-    // Base de Datos de Compañeros Pokémon en 3D (Renders Oficiales Pokémon HOME 3D)
-    const POKEMON_PARTNERS = [
+    // Lista de Medallas de Gimnasio / Logros
+    const GYM_MEDALS = [
       {
-        id: 'pichu',
-        name: 'Pichu',
-        reqLevel: 1,
-        type: 'Eléctrico',
-        bonus: 'Chispa 3D',
-        desc: 'Compañero de cantera. Pequeño pero rebosante de energía eléctrica.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/172.png'
+        id: 'med_rock',
+        name: 'Medalla Roca',
+        desc: 'Alcanzar una racha de 3 días de entrenamiento o hábitos.',
+        icon: '🪨',
+        check: () => calculateStreak() >= 3
       },
       {
-        id: 'pikachu',
-        name: 'Pikachu',
-        reqLevel: 2,
-        type: 'Eléctrico',
-        bonus: 'Rayo Raimon',
-        desc: 'Velocidad explosiva en banda. El emblema de tu equipo titular.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png'
+        id: 'med_cascade',
+        name: 'Medalla Cascada',
+        desc: 'Completar el 100% de las misiones de un día.',
+        icon: '💧',
+        check: () => {
+          const todayKey = getTodayKey();
+          const day = daysRecord[todayKey];
+          return day && masterRoutines.length > 0 && Object.keys(day.completedIds || {}).length >= masterRoutines.length;
+        }
       },
       {
-        id: 'riolu',
-        name: 'Riolu',
-        reqLevel: 4,
-        type: 'Lucha',
-        bonus: 'Pulso Aura',
-        desc: 'Incansable en el gimnasio. Mejora tu enfoque en cada serie.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/447.png'
+        id: 'med_thunder',
+        name: 'Medalla Trueno',
+        desc: 'Alcanzar el Nivel 5 de Entrenador (500 EXP).',
+        icon: '⚡',
+        check: () => getPlayerLevelAndXp().level >= 5
       },
       {
-        id: 'electabuzz',
-        name: 'Electabuzz',
-        reqLevel: 6,
-        type: 'Eléctrico',
-        bonus: 'Puño Trueno',
-        desc: 'Potencia pura en tren superior para reventar tus récords de banca.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/125.png'
+        id: 'med_pr',
+        name: 'Medalla Kanto / PR',
+        desc: 'Registrar al menos una serie en el gimnasio.',
+        icon: '🏆',
+        check: () => Object.values(gymRecords).some(arr => arr.length > 0)
       },
       {
-        id: 'lucario',
-        name: 'Lucario',
-        reqLevel: 8,
-        type: 'Lucha / Acero',
-        bonus: 'Esfera Aural',
-        desc: 'Dominio técnico y físico total. Visión de juego de élite en pista.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/448.png'
+        id: 'med_fire',
+        name: 'Medalla Fuego',
+        desc: 'Registrar al menos 3 pesajes corporales de control.',
+        icon: '🔥',
+        check: () => bodyweightRecords.length >= 3
       },
       {
-        id: 'charizard',
-        name: 'Charizard',
-        reqLevel: 10,
-        type: 'Fuego / Volador',
-        bonus: 'Tornado Fuego',
-        desc: 'Fuerza abrasadora digna del delantero estrella Axel Blaze.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/6.png'
-      },
-      {
-        id: 'cinderace',
-        name: 'Cinderace',
-        reqLevel: 13,
-        type: 'Fuego • Delantero',
-        bonus: 'Balón Ígneo',
-        desc: 'El Pokémon futbolista definitivo. Regate, disparo y cardio infinitos.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/815.png'
-      },
-      {
-        id: 'zeraora',
-        name: 'Zeraora',
-        reqLevel: 16,
-        type: 'Eléctrico Mítico',
-        bonus: 'Puños Plasma',
-        desc: 'Se mueve a la velocidad del rayo. Reflejos imparables en fútbol sala.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/807.png'
-      },
-      {
-        id: 'raikou',
-        name: 'Raikou',
-        reqLevel: 19,
-        type: 'Eléctrico Legendario',
-        bonus: 'Emperador Trueno',
-        desc: 'Bestia legendaria del relámpago. Tu disciplina es inquebrantable.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/243.png'
-      },
-      {
-        id: 'rayquaza',
-        name: 'Rayquaza Shiny',
-        reqLevel: 22,
-        type: 'Dragón Legendario',
-        bonus: 'Ascenso Draco',
-        desc: 'Cima absoluta del entrenamiento. Negro azabache y oro imperial.',
-        sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/384.png'
+        id: 'med_champion',
+        name: 'Medalla Raimon Pro',
+        desc: 'Alcanzar el Nivel 10 de Entrenador (1000 EXP).',
+        icon: '👑',
+        check: () => getPlayerLevelAndXp().level >= 10
       }
     ];
 
-    // Motor de Audio Sintético (Web Audio API)
+    const POKEMON_PARTNERS = [
+      { id: 'pichu', name: 'Pichu', reqLevel: 1, type: 'Eléctrico', bonus: 'Chispa 3D', desc: 'Compañero de cantera.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/172.png' },
+      { id: 'pikachu', name: 'Pikachu', reqLevel: 2, type: 'Eléctrico', bonus: 'Rayo Raimon', desc: 'Velocidad explosiva en banda.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/25.png' },
+      { id: 'riolu', name: 'Riolu', reqLevel: 4, type: 'Lucha', bonus: 'Pulso Aura', desc: 'Incansable en el gimnasio.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/447.png' },
+      { id: 'electabuzz', name: 'Electabuzz', reqLevel: 6, type: 'Eléctrico', bonus: 'Puño Trueno', desc: 'Potencia pura en tren superior.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/125.png' },
+      { id: 'lucario', name: 'Lucario', reqLevel: 8, type: 'Lucha / Acero', bonus: 'Esfera Aural', desc: 'Dominio físico y técnico total.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/448.png' },
+      { id: 'charizard', name: 'Charizard', reqLevel: 10, type: 'Fuego / Volador', bonus: 'Tornado Fuego', desc: 'Fuerza abrasadora de élite.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/6.png' },
+      { id: 'cinderace', name: 'Cinderace', reqLevel: 13, type: 'Fuego • Delantero', bonus: 'Balón Ígneo', desc: 'El Pokémon futbolista definitivo.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/815.png' },
+      { id: 'zeraora', name: 'Zeraora', reqLevel: 16, type: 'Eléctrico Mítico', bonus: 'Puños Plasma', desc: 'Velocidad de relámpago puro.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/807.png' },
+      { id: 'raikou', name: 'Raikou', reqLevel: 19, type: 'Eléctrico Legendario', bonus: 'Emperador Trueno', desc: 'Disciplina inquebrantable.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/243.png' },
+      { id: 'rayquaza', name: 'Rayquaza Shiny', reqLevel: 22, type: 'Dragón Legendario', bonus: 'Ascenso Draco', desc: 'Cima absoluta del entrenamiento.', sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/shiny/384.png' }
+    ];
+
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, type = 'square', duration = 0.09, delay = 0) {
       setTimeout(() => {
@@ -811,30 +749,16 @@
 
     function triggerVictoryConfetti() {
       if (typeof confetti === 'function') {
-        confetti({
-          particleCount: 65,
-          spread: 70,
-          origin: { y: 0.65 },
-          colors: ['#facc15', '#eab308', '#ffffff', '#38bdf8']
-        });
+        confetti({ particleCount: 65, spread: 70, origin: { y: 0.65 }, colors: ['#facc15', '#eab308', '#ffffff', '#38bdf8'] });
       }
     }
 
-    // Activar Efecto 3D Vanilla-Tilt en tarjetas dinámicas
     function refresh3DTilt() {
       if (typeof VanillaTilt !== 'undefined') {
-        const tiltElements = document.querySelectorAll('.tilt-card-3d');
-        VanillaTilt.init(tiltElements, {
-          max: 8,
-          speed: 400,
-          glare: true,
-          "max-glare": 0.22,
-          scale: 1.01
-        });
+        VanillaTilt.init(document.querySelectorAll('.tilt-card-3d'), { max: 8, speed: 400, glare: true, "max-glare": 0.22, scale: 1.01 });
       }
     }
 
-    // Modo Oscuro / Claro
     function initTheme() {
       const savedTheme = localStorage.getItem('theme_preference') || 'dark';
       if (savedTheme === 'light') {
@@ -860,7 +784,6 @@
       playTone(440, 'sine', 0.05);
     }
 
-    // Datos iniciales
     const DEFAULT_MASTER_ROUTINES = [
       { id: '1', title: 'Hidratación inicial (500ml agua)', emoji: '💧', slot: 'morning', category: 'Físico & Salud' },
       { id: '2', title: 'Movilidad / Estiramientos (10 min)', emoji: '⚡', slot: 'morning', category: 'Fútbol Sala & Gym' },
@@ -923,13 +846,9 @@
 
     function getPlayerLevelAndXp() {
       let totalCompletedTasks = 0;
-      Object.values(daysRecord).forEach(day => {
-        totalCompletedTasks += Object.keys(day.completedIds || {}).length;
-      });
+      Object.values(daysRecord).forEach(day => { totalCompletedTasks += Object.keys(day.completedIds || {}).length; });
       let totalGymSets = 0;
-      Object.values(gymRecords).forEach(arr => {
-        totalGymSets += arr.length;
-      });
+      Object.values(gymRecords).forEach(arr => { totalGymSets += arr.length; });
       const totalXp = (totalCompletedTasks * 15) + (totalGymSets * 25) + (bodyweightRecords.length * 20);
       const level = Math.floor(totalXp / 100) + 1;
       const xpInCurrentLevel = totalXp % 100;
@@ -938,7 +857,6 @@
 
     function updatePlayerRPGStats() {
       const { level, totalXp, xpInCurrentLevel, totalGymSets } = getPlayerLevelAndXp();
-
       const ranks = [
         { min: 1, title: "⚡ Canterano Raimon" },
         { min: 3, title: "⚽ Titular Indiscutible" },
@@ -977,6 +895,37 @@
       document.getElementById('activePartnerCardSprite').src = partnerObj.sprite;
     }
 
+    // Renderizado de Medallas de Gimnasio 3D
+    function renderMedalsView() {
+      const grid = document.getElementById('medalsGrid');
+      grid.innerHTML = '';
+      let unlockedCount = 0;
+
+      GYM_MEDALS.forEach(medal => {
+        const isUnlocked = medal.check();
+        if (isUnlocked) unlockedCount++;
+
+        const card = document.createElement('div');
+        card.className = `${isUnlocked ? 'card-3d-gold' : 'card-3d opacity-60'} tilt-card-3d p-4 rounded-2xl flex flex-col items-center text-center relative`;
+
+        card.innerHTML = `
+          <span class="absolute top-2.5 right-2.5 text-xs ${isUnlocked ? 'text-volt-400' : 'text-zinc-600'}">
+            <i class="fa-solid ${isUnlocked ? 'fa-circle-check' : 'fa-lock'}"></i>
+          </span>
+          <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl trench-3d my-2 border border-volt-400/30 shadow-inner ${isUnlocked ? 'volt-glow' : ''}">
+            <span>${medal.icon}</span>
+          </div>
+          <h4 class="font-hud font-black uppercase text-xs text-zinc-900 dark:text-white text-3d mt-1">${medal.name}</h4>
+          <p class="text-[10px] text-zinc-400 mt-1 leading-tight">${medal.desc}</p>
+        `;
+        grid.appendChild(card);
+      });
+
+      document.getElementById('unlockedMedalsCount').innerText = unlockedCount;
+      document.getElementById('totalMedalsCount').innerText = GYM_MEDALS.length;
+      refresh3DTilt();
+    }
+
     function renderPartnersView() {
       const { level } = getPlayerLevelAndXp();
       const grid = document.getElementById('pokemonGrid');
@@ -987,18 +936,14 @@
         const isSelected = poke.id === selectedPartnerId;
 
         const card = document.createElement('div');
-        card.className = `${isSelected ? 'card-3d-gold' : 'card-3d'} tilt-card-3d p-4 rounded-2xl flex flex-col items-center text-center relative ${
-          isUnlocked ? 'cursor-pointer' : 'opacity-55'
-        }`;
+        card.className = `${isSelected ? 'card-3d-gold' : 'card-3d'} tilt-card-3d p-4 rounded-2xl flex flex-col items-center text-center relative ${isUnlocked ? 'cursor-pointer' : 'opacity-55'}`;
 
         if (isUnlocked) {
           card.onclick = () => selectPokemonPartner(poke.id);
         }
 
         card.innerHTML = `
-          <span class="absolute top-2.5 left-2.5 text-[9px] font-hud uppercase font-black px-2 py-0.5 rounded-md ${
-            isUnlocked ? 'btn-3d-volt text-pitch-950' : 'trench-3d text-zinc-400'
-          }">
+          <span class="absolute top-2.5 left-2.5 text-[9px] font-hud uppercase font-black px-2 py-0.5 rounded-md ${isUnlocked ? 'btn-3d-volt text-pitch-950' : 'trench-3d text-zinc-400'}">
             NV. ${poke.reqLevel}
           </span>
           ${isSelected ? '<span class="absolute top-2.5 right-2.5 text-volt-400 text-sm drop-shadow"><i class="fa-solid fa-circle-check"></i></span>' : ''}
@@ -1089,17 +1034,11 @@
           const time = currentDayData.timestamps[routine.id] || '';
 
           const item = document.createElement('div');
-          item.className = `flex items-center justify-between p-3.5 rounded-2xl ${
-            isDone ? 'card-3d-gold' : 'card-3d'
-          } active:translate-y-1 transition-all`;
+          item.className = `flex items-center justify-between p-3.5 rounded-2xl ${isDone ? 'card-3d-gold' : 'card-3d'} active:translate-y-1 transition-all`;
 
           item.innerHTML = `
             <div class="flex items-center space-x-3.5 flex-1 cursor-pointer" onclick="toggleCheck('${routine.id}')">
-              <button class="w-7 h-7 rounded-xl flex items-center justify-center transition-all ${
-                isDone 
-                  ? 'btn-3d-volt text-pitch-950' 
-                  : 'trench-3d text-transparent'
-              }">
+              <button class="w-7 h-7 rounded-xl flex items-center justify-center transition-all ${isDone ? 'btn-3d-volt text-pitch-950' : 'trench-3d text-transparent'}">
                 ${isDone ? '<i class="fa-solid fa-bolt text-xs"></i>' : ''}
               </button>
               <div>
@@ -1130,14 +1069,11 @@
       calculateStreak();
     }
 
-    // Gimnasio 3D
     function selectGymRoutine(routineKey) {
       currentGymDay = routineKey;
       const isPecho = routineKey === 'pecho';
-      
       document.getElementById('btnDayPecho').className = `flex-1 py-2.5 text-xs font-hud font-black uppercase tracking-wider rounded-xl transition ${isPecho ? 'btn-3d-volt text-pitch-950' : 'text-zinc-400 hover:text-white'}`;
       document.getElementById('btnDayEspalda').className = `flex-1 py-2.5 text-xs font-hud font-black uppercase tracking-wider rounded-xl transition ${!isPecho ? 'btn-3d-volt text-pitch-950' : 'text-zinc-400 hover:text-white'}`;
-      
       playTone(500, 'triangle', 0.05);
       renderGymView();
     }
@@ -1158,26 +1094,17 @@
         const card = document.createElement('div');
         card.className = 'card-3d tilt-card-3d p-4 rounded-2xl border-l-4 border-l-volt-400 space-y-3';
         
-        let historyMarkup = '';
-        if (lastEntry) {
-          historyMarkup = `
-            <div class="flex items-center justify-between text-xs trench-3d p-2.5 rounded-xl">
-              <div class="flex items-center space-x-2">
-                <span class="text-zinc-400 text-[11px] font-hud"><i class="fa-regular fa-calendar mr-1 text-volt-400"></i>Último (${lastEntry.date}):</span>
-                <span class="font-hud font-black text-zinc-900 dark:text-white text-sm">${lastEntry.weight} KG <span class="text-volt-400">×</span> ${lastEntry.reps}</span>
-              </div>
-              <span class="text-[10px] font-hud uppercase btn-3d-volt text-pitch-950 px-2 py-0.5 rounded-md font-black">
-                🏆 PR: ${maxWeight}kg
-              </span>
+        let historyMarkup = lastEntry ? `
+          <div class="flex items-center justify-between text-xs trench-3d p-2.5 rounded-xl">
+            <div class="flex items-center space-x-2">
+              <span class="text-zinc-400 text-[11px] font-hud"><i class="fa-regular fa-calendar mr-1 text-volt-400"></i>Último (${lastEntry.date}):</span>
+              <span class="font-hud font-black text-zinc-900 dark:text-white text-sm">${lastEntry.weight} KG <span class="text-volt-400">×</span> ${lastEntry.reps}</span>
             </div>
-          `;
-        } else {
-          historyMarkup = `
-            <div class="text-[11px] font-hud uppercase tracking-wider text-zinc-400 trench-3d p-2.5 rounded-xl text-center">
-              Sin marcas registradas • ¡Estrena esta supertécnica!
-            </div>
-          `;
-        }
+            <span class="text-[10px] font-hud uppercase btn-3d-volt text-pitch-950 px-2 py-0.5 rounded-md font-black">🏆 PR: ${maxWeight}kg</span>
+          </div>
+        ` : `
+          <div class="text-[11px] font-hud uppercase tracking-wider text-zinc-400 trench-3d p-2.5 rounded-xl text-center">Sin marcas registradas</div>
+        `;
 
         card.innerHTML = `
           <div class="flex items-center justify-between">
@@ -1189,12 +1116,9 @@
               </div>
             </div>
             <div class="flex items-center space-x-2">
-              <button onclick="openExerciseHistoryModal('${ex.id}', '${ex.name}')" class="w-9 h-9 flex items-center justify-center btn-3d-dark text-zinc-300 hover:text-volt-400 text-xs rounded-xl" title="Ver Historial">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-              </button>
+              <button onclick="openExerciseHistoryModal('${ex.id}', '${ex.name}')" class="w-9 h-9 flex items-center justify-center btn-3d-dark text-zinc-300 hover:text-volt-400 text-xs rounded-xl"><i class="fa-solid fa-clock-rotate-left"></i></button>
               <button onclick="openGymLogModal('${ex.id}', '${ex.name}')" class="px-3.5 py-2 btn-3d-volt text-pitch-950 text-xs font-hud font-black uppercase tracking-wider rounded-xl flex items-center space-x-1">
-                <i class="fa-solid fa-plus text-[10px]"></i>
-                <span>Serie</span>
+                <i class="fa-solid fa-plus text-[10px]"></i><span>Serie</span>
               </button>
             </div>
           </div>
@@ -1202,63 +1126,45 @@
         `;
         listEl.appendChild(card);
       });
-
       refresh3DTilt();
     }
 
     function openGymLogModal(exerciseId, exerciseName) {
       document.getElementById('gymModalExerciseId').value = exerciseId;
       document.getElementById('gymModalExerciseName').innerText = exerciseName;
-      
       const history = gymRecords[exerciseId] || [];
       const lastEntry = history.length > 0 ? history[history.length - 1] : null;
       document.getElementById('gymModalWeight').value = lastEntry ? lastEntry.weight : '';
       document.getElementById('gymModalReps').value = lastEntry ? lastEntry.reps : '';
-      
       document.getElementById('gymLogModal').classList.remove('hidden');
     }
 
-    function closeGymLogModal() {
-      document.getElementById('gymLogModal').classList.add('hidden');
-    }
+    function closeGymLogModal() { document.getElementById('gymLogModal').classList.add('hidden'); }
 
     function saveGymSet() {
       const exerciseId = document.getElementById('gymModalExerciseId').value;
       const weight = parseFloat(document.getElementById('gymModalWeight').value) || 0;
       const reps = parseInt(document.getElementById('gymModalReps').value, 10) || 0;
-
       if (weight <= 0 && reps <= 0) return;
 
       if (!gymRecords[exerciseId]) gymRecords[exerciseId] = [];
-
       let prevMax = 0;
       gymRecords[exerciseId].forEach(h => { if (h.weight > prevMax) prevMax = h.weight; });
 
       const today = new Date();
-      const dateStr = `${today.getDate()}/${today.getMonth() + 1}`;
-
-      gymRecords[exerciseId].push({
-        id: Date.now().toString(),
-        date: dateStr,
-        weight: weight,
-        reps: reps
-      });
+      gymRecords[exerciseId].push({ id: Date.now().toString(), date: `${today.getDate()}/${today.getMonth() + 1}`, weight, reps });
 
       saveGymRecords();
       playLevelUpSound();
-      if (weight > prevMax && prevMax > 0) {
-        triggerVictoryConfetti();
-      }
+      if (weight > prevMax && prevMax > 0) triggerVictoryConfetti();
       closeGymLogModal();
       render();
     }
 
-    // Historial Detallado de Ejercicio
     function openExerciseHistoryModal(exerciseId, exerciseName) {
       document.getElementById('historyModalExerciseName').innerText = exerciseName;
       const historyList = document.getElementById('exerciseHistoryDetailList');
       historyList.innerHTML = '';
-
       const history = gymRecords[exerciseId] || [];
 
       if (history.length === 0) {
@@ -1272,20 +1178,15 @@
               <span class="text-zinc-400 text-[10px] font-hud uppercase font-bold bg-pitch-850 px-2 py-0.5 rounded">${entry.date}</span>
               <span class="font-hud font-black text-volt-400 text-sm">${entry.weight} KG × ${entry.reps} REPS</span>
             </div>
-            <button onclick="deleteExerciseEntry('${exerciseId}', '${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1">
-              <i class="fa-solid fa-trash text-xs"></i>
-            </button>
+            <button onclick="deleteExerciseEntry('${exerciseId}', '${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
           `;
           historyList.appendChild(row);
         });
       }
-
       document.getElementById('exerciseHistoryModal').classList.remove('hidden');
     }
 
-    function closeExerciseHistoryModal() {
-      document.getElementById('exerciseHistoryModal').classList.add('hidden');
-    }
+    function closeExerciseHistoryModal() { document.getElementById('exerciseHistoryModal').classList.add('hidden'); }
 
     function deleteExerciseEntry(exerciseId, entryId) {
       if (gymRecords[exerciseId]) {
@@ -1296,21 +1197,12 @@
       }
     }
 
-    // Peso Corporal
     function logBodyweight() {
       const input = document.getElementById('inputNewWeight');
       const val = parseFloat(input.value);
       if (!val || val <= 30 || val >= 300) return;
-
       const today = new Date();
-      const dateStr = `${today.getDate()}/${today.getMonth() + 1}`;
-
-      bodyweightRecords.unshift({
-        id: Date.now().toString(),
-        date: dateStr,
-        weight: val
-      });
-
+      bodyweightRecords.unshift({ id: Date.now().toString(), date: `${today.getDate()}/${today.getMonth() + 1}`, weight: val });
       saveBodyweightRecords();
       input.value = '';
       playCheckSound();
@@ -1332,61 +1224,38 @@
       if (bodyweightRecords.length > 0) {
         const latest = bodyweightRecords[0].weight;
         currDisplay.innerText = latest;
-
         if (bodyweightRecords.length > 1) {
-          const prev = bodyweightRecords[1].weight;
-          const diff = (latest - prev).toFixed(1);
-          const sign = diff > 0 ? `+${diff}` : `${diff}`;
-          diffDisplay.innerText = `Variación: ${sign} kg respecto al registro anterior (${bodyweightRecords[1].date})`;
+          const diff = (latest - bodyweightRecords[1].weight).toFixed(1);
+          diffDisplay.innerText = `Variación: ${diff > 0 ? `+${diff}` : diff} kg respecto al anterior`;
         } else {
-          diffDisplay.innerText = `Peso inicial registrado en ficha`;
+          diffDisplay.innerText = `Peso inicial registrado`;
         }
       } else {
         currDisplay.innerText = '--';
-        diffDisplay.innerText = 'Controla tu peso de competición (+20 EXP por registro)';
+        diffDisplay.innerText = 'Controla tu peso de competición (+20 EXP)';
       }
 
       bodyweightRecords.forEach((entry, idx) => {
-        let comp = '';
-        if (idx < bodyweightRecords.length - 1) {
-          const nextOld = bodyweightRecords[idx + 1].weight;
-          const d = (entry.weight - nextOld).toFixed(1);
-          comp = d >= 0 ? `<span class="text-volt-400 font-hud font-bold text-[11px]">+${d} kg</span>` : `<span class="text-emerald-400 font-hud font-bold text-[11px]">${d} kg</span>`;
-        }
-
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between p-3.5 card-3d rounded-xl text-xs';
         row.innerHTML = `
           <div class="flex items-center space-x-3">
             <span class="text-zinc-400 font-hud font-bold text-[11px]">${entry.date}</span>
             <span class="font-hud font-black text-zinc-900 dark:text-white text-sm">${entry.weight} KG</span>
-            ${comp}
           </div>
-          <button onclick="deleteBodyweightEntry('${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1">
-            <i class="fa-solid fa-trash text-xs"></i>
-          </button>
+          <button onclick="deleteBodyweightEntry('${entry.id}')" class="text-zinc-400 hover:text-rose-500 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
         `;
         list.appendChild(row);
       });
     }
 
-    // Copias de Seguridad
     function exportBackupData() {
-      const data = {
-        version: 4,
-        exportDate: new Date().toISOString(),
-        masterRoutines,
-        daysRecord,
-        gymRecords,
-        bodyweightRecords,
-        selectedPartnerId
-      };
-
+      const data = { version: 5, exportDate: new Date().toISOString(), masterRoutines, daysRecord, gymRecords, bodyweightRecords, selectedPartnerId };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `inazuma_3d_backup_${getTodayKey()}.json`;
+      a.download = `inazuma_medals_backup_${getTodayKey()}.json`;
       a.click();
       URL.revokeObjectURL(url);
       playLevelUpSound();
@@ -1395,7 +1264,6 @@
     function importBackupData(event) {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
@@ -1405,37 +1273,22 @@
           if (parsed.gymRecords) gymRecords = parsed.gymRecords;
           if (parsed.bodyweightRecords) bodyweightRecords = parsed.bodyweightRecords;
           if (parsed.selectedPartnerId) selectedPartnerId = parsed.selectedPartnerId;
-
-          saveMasters();
-          saveRecords();
-          saveGymRecords();
-          saveBodyweightRecords();
+          saveMasters(); saveRecords(); saveGymRecords(); saveBodyweightRecords();
           localStorage.setItem('selected_pokemon_partner', selectedPartnerId);
-
           playLevelUpSound();
-          alert('¡Partida 3D restaurada con éxito!');
+          alert('¡Partida restaurada con éxito!');
           render();
-        } catch (err) {
-          alert('Archivo JSON inválido.');
-        }
+        } catch (err) { alert('Archivo JSON inválido.'); }
       };
       reader.readAsText(file);
     }
 
-    // Gestión de Hábitos Fijos
-    function openManageModal() {
-      renderManageView();
-      document.getElementById('manageModal').classList.remove('hidden');
-    }
-
-    function closeManageModal() {
-      document.getElementById('manageModal').classList.add('hidden');
-    }
+    function openManageModal() { renderManageView(); document.getElementById('manageModal').classList.remove('hidden'); }
+    function closeManageModal() { document.getElementById('manageModal').classList.add('hidden'); }
 
     function renderManageView() {
       const list = document.getElementById('manageRoutinesList');
       list.innerHTML = '';
-
       masterRoutines.forEach(routine => {
         const slotLabels = { morning: 'Mañana', afternoon: 'Tarde', night: 'Noche' };
         const row = document.createElement('div');
@@ -1446,19 +1299,13 @@
             <div>
               <p class="text-xs font-bold text-zinc-900 dark:text-zinc-100">${routine.title}</p>
               <div class="flex items-center space-x-1.5 text-[9px] font-hud uppercase text-volt-400 font-bold">
-                <span>${slotLabels[routine.slot]}</span>
-                <span>•</span>
-                <span>${routine.category}</span>
+                <span>${slotLabels[routine.slot]}</span><span>•</span><span>${routine.category}</span>
               </div>
             </div>
           </div>
           <div class="flex items-center space-x-1">
-            <button onclick="openRoutineModal('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-volt-400">
-              <i class="fa-solid fa-pen text-xs"></i>
-            </button>
-            <button onclick="promptDelete('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-rose-500">
-              <i class="fa-solid fa-trash text-xs"></i>
-            </button>
+            <button onclick="openRoutineModal('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-volt-400"><i class="fa-solid fa-pen text-xs"></i></button>
+            <button onclick="promptDelete('${routine.id}')" class="p-1.5 text-zinc-400 hover:text-rose-500"><i class="fa-solid fa-trash text-xs"></i></button>
           </div>
         `;
         list.appendChild(row);
@@ -1476,19 +1323,9 @@
 
       if (id) {
         const r = masterRoutines.find(x => x.id === id);
-        title.innerText = 'Editar Misión';
-        editId.value = r.id;
-        nameInput.value = r.title;
-        emojiInput.value = r.emoji;
-        slotInput.value = r.slot;
-        catInput.value = r.category;
+        title.innerText = 'Editar Misión'; editId.value = r.id; nameInput.value = r.title; emojiInput.value = r.emoji; slotInput.value = r.slot; catInput.value = r.category;
       } else {
-        title.innerText = 'Nueva Misión Fija';
-        editId.value = '';
-        nameInput.value = '';
-        emojiInput.value = '⚡';
-        slotInput.value = 'morning';
-        catInput.value = 'Físico & Salud';
+        title.innerText = 'Nueva Misión Fija'; editId.value = ''; nameInput.value = ''; emojiInput.value = '⚡'; slotInput.value = 'morning'; catInput.value = 'Físico & Salud';
       }
       modal.classList.remove('hidden');
     }
@@ -1501,44 +1338,24 @@
       const emoji = document.getElementById('routineEmojiInput').value.trim() || '⚡';
       const slot = document.getElementById('routineTimeSlotInput').value;
       const category = document.getElementById('routineCategoryInput').value;
-
       if (!title) return;
 
       if (id) {
         const item = masterRoutines.find(x => x.id === id);
-        if (item) {
-          item.title = title;
-          item.emoji = emoji;
-          item.slot = slot;
-          item.category = category;
-        }
+        if (item) { item.title = title; item.emoji = emoji; item.slot = slot; item.category = category; }
       } else {
         masterRoutines.push({ id: Date.now().toString(), title, emoji, slot, category });
       }
-
-      saveMasters();
-      playCheckSound();
-      closeRoutineModal();
-      render();
+      saveMasters(); playCheckSound(); closeRoutineModal(); render();
     }
 
-    function promptDelete(id) {
-      pendingDeleteId = id;
-      document.getElementById('deleteModal').classList.remove('hidden');
-    }
-
-    function closeDeleteModal() {
-      pendingDeleteId = null;
-      document.getElementById('deleteModal').classList.add('hidden');
-    }
+    function promptDelete(id) { pendingDeleteId = id; document.getElementById('deleteModal').classList.remove('hidden'); }
+    function closeDeleteModal() { pendingDeleteId = null; document.getElementById('deleteModal').classList.add('hidden'); }
 
     document.getElementById('btnConfirmDelete').addEventListener('click', () => {
       if (pendingDeleteId) {
         masterRoutines = masterRoutines.filter(r => r.id !== pendingDeleteId);
-        saveMasters();
-        playTone(240, 'sawtooth', 0.1);
-        closeDeleteModal();
-        render();
+        saveMasters(); playTone(240, 'sawtooth', 0.1); closeDeleteModal(); render();
       }
     });
 
@@ -1549,10 +1366,8 @@
         const key = `${curr.getFullYear()}-${String(curr.getMonth()+1).padStart(2,'0')}-${String(curr.getDate()).padStart(2,'0')}`;
         const rec = daysRecord[key];
         if (rec && masterRoutines.length > 0) {
-          const completedCount = Object.keys(rec.completedIds || {}).length;
-          if (completedCount / masterRoutines.length >= 0.6) {
-            streak++;
-            curr.setDate(curr.getDate() - 1);
+          if (Object.keys(rec.completedIds || {}).length / masterRoutines.length >= 0.6) {
+            streak++; curr.setDate(curr.getDate() - 1);
           } else break;
         } else break;
       }
@@ -1563,23 +1378,17 @@
     function renderStats() {
       const historyEl = document.getElementById('historyList');
       historyEl.innerHTML = '';
-      let totalPct = 0;
-      let countedDays = 0;
+      let totalPct = 0; let countedDays = 0;
 
       for (let i = 0; i < 14; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
+        const d = new Date(); d.setDate(d.getDate() - i);
         const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         const rec = daysRecord[key] || { completedIds: {} };
-
         const total = masterRoutines.length;
         const done = Object.keys(rec.completedIds || {}).length;
         const pct = total === 0 ? 0 : Math.round((done / total) * 100);
 
-        if (i < 7) {
-          totalPct += pct;
-          countedDays++;
-        }
+        if (i < 7) { totalPct += pct; countedDays++; }
 
         const dateTitle = i === 0 ? 'Hoy' : (i === 1 ? 'Ayer' : d.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' }));
         const row = document.createElement('div');
@@ -1606,8 +1415,7 @@
       const statMentalidad = Math.min(99, 50 + (totalCompletedTasks * 2));
       const statResist = Math.min(99, 50 + (streak * 6) + (level * 2));
 
-      const media = Math.round((statPotencia + statDisciplina + statAgilidad + statMentalidad + statResist) / 5);
-      document.getElementById('overallRating').innerText = media;
+      document.getElementById('overallRating').innerText = Math.round((statPotencia + statDisciplina + statAgilidad + statMentalidad + statResist) / 5);
 
       const ctx = document.getElementById('playerRadarChart');
       if (ctx && typeof Chart !== 'undefined') {
@@ -1627,19 +1435,14 @@
             }]
           },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false,
             scales: {
               r: {
-                min: 20,
-                max: 100,
+                min: 20, max: 100,
                 ticks: { display: false, stepSize: 20 },
                 grid: { color: 'rgba(255, 255, 255, 0.12)' },
                 angleLines: { color: 'rgba(250, 204, 21, 0.25)' },
-                pointLabels: {
-                  color: '#facc15',
-                  font: { family: 'Chakra Petch', size: 10, weight: 'bold' }
-                }
+                pointLabels: { color: '#facc15', font: { family: 'Chakra Petch', size: 10, weight: 'bold' } }
               }
             },
             plugins: { legend: { display: false } }
@@ -1651,6 +1454,7 @@
     function switchTab(tab) {
       document.getElementById('viewDaily').classList.toggle('hidden', tab !== 'daily');
       document.getElementById('viewGym').classList.toggle('hidden', tab !== 'gym');
+      document.getElementById('viewMedals').classList.toggle('hidden', tab !== 'medals');
       document.getElementById('viewPartners').classList.toggle('hidden', tab !== 'partners');
       document.getElementById('viewBodyweight').classList.toggle('hidden', tab !== 'bodyweight');
       document.getElementById('viewStats').classList.toggle('hidden', tab !== 'stats');
@@ -1658,13 +1462,15 @@
       document.getElementById('dateSelectorBar').classList.toggle('hidden', tab !== 'daily');
       document.getElementById('dailyProgressContainer').classList.toggle('hidden', tab !== 'daily');
 
-      const tabs = ['daily', 'gym', 'partners', 'bodyweight', 'stats'];
+      const tabs = ['daily', 'gym', 'medals', 'partners', 'bodyweight', 'stats'];
       tabs.forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
-        if (t === tab) {
-          btn.className = 'flex-1 py-2 rounded-xl btn-3d-volt text-pitch-950 font-black transition-all flex items-center justify-center space-x-1';
-        } else {
-          btn.className = 'flex-1 py-2 rounded-xl text-zinc-400 hover:text-white transition-all font-bold flex items-center justify-center space-x-1';
+        if (btn) {
+          if (t === tab) {
+            btn.className = 'py-2 rounded-xl btn-3d-volt text-pitch-950 font-black transition-all flex flex-col items-center justify-center';
+          } else {
+            btn.className = 'py-2 rounded-xl text-zinc-400 hover:text-white transition-all font-bold flex flex-col items-center justify-center';
+          }
         }
       });
 
@@ -1676,6 +1482,7 @@
       updatePlayerRPGStats();
       renderDailyView();
       renderGymView();
+      renderMedalsView();
       renderPartnersView();
       renderBodyweightView();
       renderManageView();
